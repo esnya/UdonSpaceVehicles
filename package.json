@@ -6,8 +6,6 @@
   "description": "Space vehicle system for VRChat world with UDON.",
   "keywords": [
     "Unity",
-    "ShaderLab",
-    "Shader"
   ],
   "homepage": "https://github.com/esnya/UdonSpaceVehicles#readme",
   "bugs": {
@@ -48,14 +46,6 @@
       "master",
       {
         "name": "next",
-        "prerelease": true
-      },
-      {
-        "name": "beta",
-        "prerelease": true
-      },
-      {
-        "name": "alpha",
         "prerelease": true
       }
     ],
