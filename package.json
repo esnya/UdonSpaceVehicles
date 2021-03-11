@@ -4,9 +4,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "Space vehicle system for VRChat world with UDON.",
-  "keywords": [
-    "Unity",
-  ],
+  "keywords": ["VRChat"],
   "homepage": "https://github.com/esnya/UdonSpaceVehicles#readme",
   "bugs": {
     "url": "https://github.com/esnya/UdonSpaceVehicles/issues"
