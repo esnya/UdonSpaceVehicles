@@ -1,7 +1,7 @@
 node_modules
 node_modules.meta
 !/node_modules/node_modules.asmdef
-/Assets/UdonSpaceVehicles/Demo/*
+/Assets/UdonSpaceVehicles/Demo
 
 # This .gitignore file should be placed at the root of your Unity project directory
 #
