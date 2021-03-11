@@ -1,0 +1,16 @@
+{
+    "name": "UdonSpaceVehiclesRuntime",
+    "references": [
+        "VRC.Udon",
+        "UdonSharp.Runtime",
+        "UdonToolkitRuntime"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}
