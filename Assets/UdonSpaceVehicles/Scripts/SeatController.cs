@@ -46,10 +46,10 @@ namespace UdonSpaceVehicles
         void LateUpdate()
         {
             if (seated && !adjusted) {
-                var headPosition = Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
-                var worldVector = Vector3.Scale(viewPosition.position - headPosition, viewPosition.TransformVector(adjustorAxis));
-                transform.localPosition += transform.InverseTransformVector(worldVector);
-                adjusted = worldVector.magnitude <= adjustorThreshold;
+                var headPosition = viewPosition.InverseTransformPoint(Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position);
+                var diff = Vector3.Scale(-headPosition, adjustorAxis);
+                transform.localPosition += diff;
+                adjusted = diff.magnitude <= adjustorThreshold;
             }
         }
         #endregion

@@ -5,6 +5,7 @@ ModelImporter:
   fileIDToRecycleName:
     100000: //RootNode
     400000: //RootNode
+    2100000: ThrusterCluster
     2300000: //RootNode
     3300000: //RootNode
     4300000: ThrusterCluster
@@ -14,6 +15,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: SpacePod_Body
     second: {fileID: 2100000, guid: b56b407fce4f26c4a98bb66ac8901fe6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: ThrusterCluster
+    second: {fileID: 2100000, guid: fc5853ba2dafef14a913c0d44ef53636, type: 2}
   materials:
     importMaterials: 1
     materialName: 0
