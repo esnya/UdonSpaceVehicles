@@ -19,6 +19,12 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Logics
+        private void SetPower(int index, float power) {
+            engines[index].relativeForce =  Vector3.forward * powers[index] * power;
+
+            var animator = animators[index];
+            if (animator != null) animator.SetFloat("Power", power);
+        }
         #endregion
 
         #region Unity Events
@@ -38,21 +44,20 @@ namespace UdonSpaceVehicles
                 var animator = engine.GetComponentInChildren<Animator>();
                 animators[i] = (animator == null) ? null : animator;
             }
+
+            Log("Initialized");
         }
         #endregion
 
         #region Udon Events
-        void Update()
+        private void Update()
         {
             if (!active) return;
 
             var input = controllerInput.input;
             for (int i = 0; i < engineCount; i++) {
-                var normalizedPower =Vector3.Dot(input, axises[i]);
-                engines[i].relativeForce =  Vector3.forward *  normalizedPower * powers[i];
-
-                var animator = animators[i];
-                if (animator != null) animator.SetFloat("Power", normalizedPower);
+                var power = Vector3.Dot(input, axises[i]);
+                SetPower(i, power);
             }
         }
         #endregion
@@ -65,11 +70,23 @@ namespace UdonSpaceVehicles
         public void Activate()
         {
             active = true;
+
+            Log("Activated");
         }
 
         public void Deactivate()
         {
             active = false;
+
+            for (int i = 0; i < engineCount; i++) SetPower(i, 0.0f);
+
+            Log("Deactivated");
+        }
+        #endregion
+
+        #region Logger
+        private void Log(string log) {
+            Debug.Log($"[{gameObject.name}] {log}");
         }
         #endregion
     }

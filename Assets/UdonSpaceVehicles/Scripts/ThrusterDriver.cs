@@ -13,7 +13,7 @@ namespace UdonSpaceVehicles
     public class ThrusterDriver : UdonSharpBehaviour
     {
         #region Public Variables
-        public ControllerInput joystickInput;
+        public RCSController rcsController;
         public ConstantForce[] thrusters;
         public float thrustPower = 20.0f;
         [Range(0.0f, 1.0f)] public float thrustThreshold = 0.5f;
@@ -55,12 +55,12 @@ namespace UdonSpaceVehicles
         private void Update() {
             if (!active) return;
 
-            var joystickValue = joystickInput.input;
-            var throttleValue = Vector3.zero;
+            var rotationInput = rcsController.rotation;
+            var translationInput = rcsController.translation;
 
             for (int i = 0; i < thrusterCount; i++) {
-                var rotation = Mathf.Clamp01(Vector3.Dot(thrusterRotationAxises[i], joystickValue));
-                var translation = Mathf.Clamp01(Vector3.Dot(thrusterTranslationAxises[i], throttleValue)) * 0.0f;
+                var rotation = Mathf.Clamp01(Vector3.Dot(thrusterRotationAxises[i], rotationInput));
+                var translation = Mathf.Clamp01(Vector3.Dot(thrusterTranslationAxises[i], translationInput));
 
                 var thrust = rotation + translation >= thrustThreshold;
                 SetThrust(i, thrust);
@@ -83,7 +83,7 @@ namespace UdonSpaceVehicles
             active = true;
         }
 
-        public void Deactivate() {
+        public void Dectivate() {
             active = false;
 
             for (int i = 0; i < thrusterCount; i++) {

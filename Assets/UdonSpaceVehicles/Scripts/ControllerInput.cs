@@ -1,4 +1,4 @@
-﻿
+
 using UdonSharp;
 using UdonToolkit;
 using UnityEngine;
@@ -172,13 +172,11 @@ namespace UdonSpaceVehicles
 
         #region Activatable
         bool active;
-        public void Activate()
-        {
+        public void Activate() {
             active = true;
         }
 
-        public void Deactivate()
-        {
+        public void Deactivate() {
             active = false;
         }
         #endregion

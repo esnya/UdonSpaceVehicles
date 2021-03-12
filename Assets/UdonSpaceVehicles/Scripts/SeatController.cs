@@ -13,7 +13,7 @@ namespace UdonSpaceVehicles
     public class SeatController : UdonSharpBehaviour
     {
         #region Public Variables
-        public VehicleRoot root;
+        public UdonActivator activationTarget;
         public Transform viewPosition;
         public Vector3 adjustorAxis = new Vector3(0.0f, 1.0f, 1.0f);
         public float adjustorThreshold = 0.05f;
@@ -75,14 +75,14 @@ namespace UdonSpaceVehicles
                 seated = true;
                 adjusted = false;
 
-                root.Activate();
+                activationTarget.Activate();
             }
         }
 
         public override void OnStationExited(VRCPlayerApi player)
         {
             if (player.isLocal) {
-                root.Deactivate();
+                activationTarget.Deactivate();
 
                 seated = false;
                 transform.localPosition = initialPosition;
