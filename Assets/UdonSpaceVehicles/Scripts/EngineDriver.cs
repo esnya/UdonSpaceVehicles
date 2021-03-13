@@ -14,55 +14,98 @@ namespace UdonSpaceVehicles
     {
         #region Public Variables
         public ControllerInput controllerInput;
-        [ListView("Engines / Powers")][UTEditor] public ConstantForce[] engines = {};
-        [ListView("Engines / Powers")][UTEditor] public float[] powers = {};
+        public SyncManager syncManager;
+        public uint syncManagerBank = 1u;
+
+        [ListView("Engines / Powers")][UTEditor] public ConstantForce[] engines = { };
+        [ListView("Engines / Powers")][UTEditor] public float[] powers = { };
+        [RangeSlider(0.0f, 1.0f)][UTEditor] public float remoteAnimationThreshold = 0.1f;
+        [HelpBox("Updates float parameter \"Engine Power\" with max value of engine powers.")][UTEditor] public Animator[] animators;
         #endregion
 
         #region Logics
-        private void SetPower(int index, float power) {
-            engines[index].relativeForce =  Vector3.forward * powers[index] * power;
-
-            var animator = animators[index];
+        private void SetAnimation(int index, float power)
+        {
+            var animator = engineAnimators[index];
             if (animator != null) animator.SetFloat("Power", power);
+        }
+
+        private void SetPower(int index, float power)
+        {
+            engines[index].relativeForce = Vector3.forward * powers[index] * power;
+
+            SetAnimation(index, power);
+            syncManager.SetBool(syncManagerBank, index, power > remoteAnimationThreshold);
+        }
+
+        private void UpdateAnimatiors(float power)
+        {
+            foreach (var animator in animators) animator.SetFloat("Engine Power", power);
+            syncManager.SetBool(syncManagerBank,31, power > remoteAnimationThreshold);
         }
         #endregion
 
         #region Unity Events
-        int engineCount;
-        Animator[] animators;
+        int engineCount, animatorCount;
+        Animator[] engineAnimators;
         Vector3[] axises;
         void Start()
         {
             engineCount = Mathf.Min(engines.Length, powers.Length);
+            animatorCount = animators.Length;
 
             axises = new Vector3[engineCount];
-            animators = new Animator[engineCount];
-            for (int i = 0; i < engineCount; i++) {
+            engineAnimators = new Animator[engineCount];
+            for (int i = 0; i < engineCount; i++)
+            {
                 var engine = engines[i];
                 axises[i] = transform.InverseTransformVector(engine.transform.forward);
 
                 var animator = engine.GetComponentInChildren<Animator>();
-                animators[i] = (animator == null) ? null : animator;
+                engineAnimators[i] = (animator == null) ? null : animator;
             }
 
             Log("Initialized");
         }
-        #endregion
 
-        #region Udon Events
         private void Update()
         {
             if (!active) return;
 
             var input = controllerInput.input;
-            for (int i = 0; i < engineCount; i++) {
+            var maxPower = 0.0f;
+            for (int i = 0; i < engineCount; i++)
+            {
                 var power = Vector3.Dot(input, axises[i]);
+                maxPower = Mathf.Max(maxPower, power);
                 SetPower(i, power);
+            }
+
+            UpdateAnimatiors(maxPower);
+        }
+        #endregion
+
+        #region Udon Events
+        public override void OnPlayerJoined(VRCPlayerApi player)
+        {
+            if (player.isLocal) {
+                syncManager.AddEventListener(this, syncManagerBank,  ~0u, nameof(syncValue), nameof(prevValue), nameof(_SyncValueChanged));
             }
         }
         #endregion
 
         #region Custom Events
+        [HideInInspector] public uint syncValue, prevValue;
+        public void _SyncValueChanged() {
+            for (int i = 0; i < engineCount; i++) {
+                var b = UnpackBool(syncValue, i);
+                if (b == UnpackBool(prevValue, i)) continue;
+                SetAnimation(i, b ? 100.0f : 0.0f);
+            }
+
+            var globalValue = UnpackBool(syncValue, 31);
+            if (globalValue != UnpackBool(prevValue, 31)) UpdateAnimatiors(globalValue ? 1.0f : 0.0f);
+        }
         #endregion
 
         #region Activatable
@@ -79,14 +122,46 @@ namespace UdonSpaceVehicles
             active = false;
 
             for (int i = 0; i < engineCount; i++) SetPower(i, 0.0f);
+            UpdateAnimatiors(0.0f);
 
             Log("Deactivated");
         }
         #endregion
 
         #region Logger
-        private void Log(string log) {
+        private void Log(string log)
+        {
             Debug.Log($"[{gameObject.name}] {log}");
+        }
+        #endregion
+
+        #region Value Packing
+        private uint UnpackValue(uint packed, int byteOffset, uint bitmask)
+        {
+            return (packed >> byteOffset & bitmask);
+        }
+        private uint PackValue(uint packed, int byteOffset, uint bitmask, uint value)
+        {
+            var mask = bitmask << byteOffset;
+            return packed & mask | value & bitmask << byteOffset;
+        }
+
+        private bool UnpackBool(uint packed, int byteOffset)
+        {
+            return UnpackValue(packed, byteOffset, 0x01) != 0;
+        }
+        private uint PackBool(uint packed, int byteOffset, bool value)
+        {
+            return PackValue(packed, byteOffset, 0x1, value ? 1u : 0u);
+        }
+
+        private byte UnpackByte(uint packed, int byteOffset)
+        {
+            return (byte)UnpackValue(packed, byteOffset, 0xff);
+        }
+        private uint PackByte(uint packed, int byteOffset, byte value)
+        {
+            return PackValue(packed, byteOffset, 0xff, value);
         }
         #endregion
     }

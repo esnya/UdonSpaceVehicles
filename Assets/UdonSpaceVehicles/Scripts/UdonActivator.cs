@@ -13,22 +13,17 @@ namespace UdonSpaceVehicles
     public class UdonActivator : UdonSharpBehaviour
     {
         #region Public Variables
-        [SectionHeader("Target UdonBehaviours")][UTEditor] public Component[] targets = {};
-        public bool activateChildren;
-
-        [Space][SectionHeader("Configurations")][UTEditor] public bool takeOwnership;
-
-        [Space][SectionHeader("Animators")][UTEditor] public bool fireAnimatorTriggers = true;
-        [ListView("Animator Trigger On Activate")][UTEditor] public Animator[] animatorsOnActivate;
-        [ListView("Animator Trigger On Activate")][Popup("animator", "@animatorsOnActivate", true)][UTEditor] public string[] animatorTriggersOnActivate;
-        [ListView("Animator Trigger On Deactivate")][UTEditor] public Animator[] animatorsOnDeactivate;
-        [ListView("Animator Trigger On Deactivate")][Popup("animator", "@animatorsOnDeactivate", true)][UTEditor] public string[] animatorTriggersOnDeactivate;
+        public bool autoIncludeChildren;
+        [SectionHeader("Target UdonBehaviours")] [UTEditor] public Component[] targets = { };
+        [Space] [SectionHeader("Configurations")] [UTEditor] public bool takeOwnership;
         #endregion
 
         #region Logics
-        private void BroadcastActivation(bool active) {
+        private void BroadcastActivation(bool active)
+        {
             var localPlayer = Networking.LocalPlayer;
-            foreach (var obj in targetUdons) {
+            foreach (var obj in targetUdons)
+            {
                 if (obj == null) continue;
 
                 var udon = (UdonBehaviour)obj;
@@ -37,16 +32,6 @@ namespace UdonSpaceVehicles
                 if (active && takeOwnership) Networking.SetOwner(localPlayer, udon.gameObject);
 
                 udon.SendCustomEvent(active ? "Activate" : "Deactivate");
-            }
-
-            if (fireAnimatorTriggers) {
-                var animators = active ? animatorsOnActivate : animatorsOnDeactivate;
-                var triggers = active ? animatorTriggersOnActivate : animatorTriggersOnDeactivate;
-
-                var length = Mathf.Min(animators.Length, triggers.Length);
-                for (int i = 0; i < length; i++) {
-                    animators[i].SetTrigger(triggers[i]);
-                }
             }
         }
         #endregion
@@ -57,12 +42,13 @@ namespace UdonSpaceVehicles
         {
             if (targets == null) targets = new Component[0];
 
-            var children = activateChildren ? (Component[])GetComponentsInChildren(typeof(UdonBehaviour)) : new Component[] {};
+            var children = autoIncludeChildren ? (Component[])GetComponentsInChildren(typeof(UdonBehaviour)) : new Component[] { };
 
             targetUdons = new Component[children.Length + targets.Length];
             System.Array.Copy(children, targetUdons, children.Length);
 
-            for (int i = 0; i < targets.Length; i++) {
+            for (int i = 0; i < targets.Length; i++)
+            {
                 var target = targets[i];
                 if (target == null) continue;
                 targetUdons[i] = target.GetComponent(typeof(UdonBehaviour));
@@ -92,7 +78,8 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Logger
-        private void Log(string log) {
+        private void Log(string log)
+        {
             Debug.Log($"[{gameObject.name}] {log}");
         }
         #endregion

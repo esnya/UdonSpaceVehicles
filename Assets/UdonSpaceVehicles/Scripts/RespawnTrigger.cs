@@ -9,7 +9,8 @@ using VRC.Udon.Common.Interfaces;
 
 namespace UdonSpaceVehicles
 {
-    [CustomName("USV Respawn Trigger")][HelpMessage("Interact or call Trigger event to respawn.")]
+    [CustomName("USV Respawn Trigger")]
+    [HelpMessage("Interact or call Trigger event to respawn.")]
     public class RespawnTrigger : UdonSharpBehaviour
     {
         #region Public Variables
@@ -25,7 +26,8 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Unity Events
-        private void Start() {
+        private void Start()
+        {
             targetRigidbody = target.GetComponent<Rigidbody>();
             initialPosition = target.position;
             initialRotation = target.rotation;
@@ -33,18 +35,24 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Udon Events
-        public override void Interact() {
+        public override void Interact()
+        {
             if (interactable) Trigger();
         }
         #endregion
 
         #region Custom Events
-        public void Trigger() {
-            if (sendToOwner && !Networking.IsOwner(target.gameObject)) {
+        public void Trigger()
+        {
+            if (sendToOwner && !Networking.IsOwner(target.gameObject))
+            {
                 SendCustomNetworkEvent(NetworkEventTarget.Owner, nameof(Trigger));
                 return;
-            } else {
-                if (targetRigidbody != null) {
+            }
+            else
+            {
+                if (targetRigidbody != null)
+                {
                     targetRigidbody.velocity = Vector3.zero;
                     targetRigidbody.angularVelocity = Vector3.zero;
                 }
@@ -52,7 +60,8 @@ namespace UdonSpaceVehicles
                 target.position = initialPosition;
                 target.rotation = initialRotation;
 
-                if (targetRigidbody != null) {
+                if (targetRigidbody != null)
+                {
                     targetRigidbody.Sleep();
                 }
             }

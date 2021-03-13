@@ -13,10 +13,13 @@ namespace UdonSpaceVehicles
     public class ThrusterDriver : UdonSharpBehaviour
     {
         #region Public Variables
-        public RCSController rcsController;
-        public ConstantForce[] thrusters;
+        [SectionHeader("References")] [UTEditor] public RCSController rcsController;
+        public SyncManager syncManager;
+        public uint syncManagerBank = 2u;
+
+        [Space] [SectionHeader("Configurations")] [UTEditor] public ConstantForce[] thrusters;
         public float thrustPower = 20.0f;
-        [Range(0.0f, 1.0f)] public float thrustThreshold = 0.5f;
+        [Range(0.0f, 1.0f)] public float thrustThreshold = 0.1f;
         #endregion
 
         #region Internal Variables
@@ -26,21 +29,31 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Logics
-        private void SetThrust(int i, bool thrust) {
+        private void SetThrustAnimation(int i, bool thrust) {
+
+            if (thrusterAnimators[i] == null) return;
+            thrusterAnimators[i].SetFloat("Power", thrust ? 1 : 0);
+        }
+
+        private void SetThrust(int i, bool thrust)
+        {
             thrusters[i].relativeForce = thrust ? -Vector3.forward * thrustPower : Vector3.zero;
-            if (thrusterAnimators[i] != null) thrusterAnimators[i].SetFloat("Power", thrust  ? 1 : 0);
+            SetThrustAnimation(i, thrust);
+            syncManager.SetBool(syncManagerBank, i, thrust);
         }
         #endregion
 
         #region Unity Events
-        private void Start() {
+        private void Start()
+        {
             var center = transform.position;
 
             thrusterCount = thrusters.Length;
             thrusterAnimators = new Animator[thrusterCount];
             thrusterRotationAxises = new Vector3[thrusterCount];
             thrusterTranslationAxises = new Vector3[thrusterCount];
-            for (int i = 0; i < thrusterCount; i++) {
+            for (int i = 0; i < thrusterCount; i++)
+            {
                 var thruster = thrusters[i];
 
                 var centerToThruster = (thruster.transform.position - center).normalized;
@@ -50,15 +63,19 @@ namespace UdonSpaceVehicles
 
                 thrusterAnimators[i] = thruster.GetComponentInChildren<Animator>();
             }
+
+            Log("Initialized");
         }
 
-        private void Update() {
+        private void Update()
+        {
             if (!active) return;
 
             var rotationInput = rcsController.rotation;
             var translationInput = rcsController.translation;
 
-            for (int i = 0; i < thrusterCount; i++) {
+            for (int i = 0; i < thrusterCount; i++)
+            {
                 var rotation = Mathf.Clamp01(Vector3.Dot(thrusterRotationAxises[i], rotationInput));
                 var translation = Mathf.Clamp01(Vector3.Dot(thrusterTranslationAxises[i], translationInput));
 
@@ -69,28 +86,71 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Udon Events
-        #endregion
-
-        #region Custom Events
-        #endregion
-
-        #region Internal Logics
-        #endregion
-
-        #region Activatable
-        private bool active;
-        public void Activate() {
-            active = true;
-        }
-
-        public void Dectivate() {
-            active = false;
-
-            for (int i = 0; i < thrusterCount; i++) {
-                SetThrust(i, false);
+        public override void OnPlayerJoined(VRCPlayerApi player) {
+            if (player.isLocal) {
+                syncManager.AddEventListener(this, syncManagerBank, ~0u, nameof(syncValue), nameof(prevValue), nameof(_SyncValueChanged));
             }
         }
         #endregion
 
+        #region Custom Events
+        [HideInInspector] public uint syncValue, prevValue;
+        public void _SyncValueChanged()
+        {
+            for (int i = 0; i < thrusterCount; i++) {
+                var b = UnpackBool(syncValue, i);
+                if (b != UnpackBool(prevValue, i)) SetThrustAnimation(i, b);
+            }
+        }
+        #endregion
+
+        #region Value Packer
+        uint UnpackValue(uint packed, int bitOffset, uint bitmask)
+        {
+            return (packed >> bitOffset & bitmask);
+        }
+        uint PackValue(uint packed, int bitOffset, uint bitmask, uint value)
+        {
+            var mask = bitmask << bitOffset;
+            return packed & mask | value & bitmask << bitOffset;
+        }
+
+        bool UnpackBool(uint packed, int bitOffset)
+        {
+            return UnpackValue(packed, bitOffset, 0x01) != 0;
+        }
+        uint PackBool(uint packed, int bitOffset, bool value)
+        {
+            return PackValue(packed, bitOffset, 0x1, value ? 1u : 0u);
+        }
+        #endregion
+
+        #region Activatable
+        private bool active;
+        public void Activate()
+        {
+            active = true;
+            Log("Activated");
+        }
+
+        public void Dectivate()
+        {
+            active = false;
+
+            for (int i = 0; i < thrusterCount; i++)
+            {
+                SetThrust(i, false);
+            }
+
+            Log("Deactivated");
+        }
+        #endregion
+        
+        #region Logger
+        private void Log(string log)
+        {
+            Debug.Log($"[{gameObject.name}] {log}");
+        }
+        #endregion
     }
 }

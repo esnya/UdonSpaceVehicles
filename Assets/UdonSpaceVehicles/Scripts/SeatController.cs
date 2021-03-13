@@ -9,7 +9,8 @@ using VRC.Udon.Common.Interfaces;
 
 namespace UdonSpaceVehicles
 {
-    [RequireComponent(typeof(VRCStation))][CustomName("USV Seat Controller")]
+    [RequireComponent(typeof(VRCStation))]
+    [CustomName("USV Seat Controller")]
     public class SeatController : UdonSharpBehaviour
     {
         #region Public Variables
@@ -31,25 +32,31 @@ namespace UdonSpaceVehicles
         #region Unity Events
         VRCStation station;
         Vector3 initialPosition;
-        void Start()
+        Collider triggerCollider;
+        private void Start()
         {
             station = (VRCStation)GetComponent(typeof(VRCStation));
             station.disableStationExit = true;
+            triggerCollider = GetComponent<Collider>();
             initialPosition = transform.localPosition;
+
+            Log("Initialized");
         }
 
-        void Update()
+        private void Update()
         {
             if (seated && GetExitInput()) station.ExitStation(Networking.LocalPlayer);
         }
 
-        void LateUpdate()
+        private void LateUpdate()
         {
-            if (seated && !adjusted) {
+            if (seated && !adjusted)
+            {
                 var headPosition = viewPosition.InverseTransformPoint(Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position);
                 var diff = Vector3.Scale(-headPosition, adjustorAxis);
                 transform.localPosition += diff;
                 adjusted = diff.magnitude <= adjustorThreshold;
+                Log($"Adjusting {diff}");
             }
         }
         #endregion
@@ -58,8 +65,10 @@ namespace UdonSpaceVehicles
         bool vr;
         public override void OnPlayerJoined(VRCPlayerApi player)
         {
-            if (player.isLocal) {
+            if (player.isLocal)
+            {
                 vr = player.IsUserInVR();
+                Log($"VR: {vr}");
             }
         }
 
@@ -71,7 +80,12 @@ namespace UdonSpaceVehicles
         bool seated, adjusted;
         public override void OnStationEntered(VRCPlayerApi player)
         {
-            if (player.isLocal) {
+            Log("Entered");
+
+            triggerCollider.enabled = false;
+
+            if (player.isLocal)
+            {
                 seated = true;
                 adjusted = false;
 
@@ -81,12 +95,24 @@ namespace UdonSpaceVehicles
 
         public override void OnStationExited(VRCPlayerApi player)
         {
-            if (player.isLocal) {
+            Log("Exited");
+
+            triggerCollider.enabled = true;
+
+            if (player.isLocal)
+            {
                 activationTarget.Deactivate();
 
                 seated = false;
                 transform.localPosition = initialPosition;
             }
+        }
+        #endregion
+        
+        #region Logger
+        private void Log(string log)
+        {
+            Debug.Log($"[{gameObject.name}] {log}");
         }
         #endregion
     }
