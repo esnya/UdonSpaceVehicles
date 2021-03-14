@@ -40,13 +40,11 @@
     "semantic-release-gitmoji": "^1.3.4"
   },
   "release": {
-    "release": {
-      "branches": [
-        "master",
-        { "name": "next", "prerelease": true },
-        { "name": "alpha", "prerelease": true }
-      ]
-    },
+    "branches": [
+      "master",
+      { "name": "next", "prerelease": true },
+      { "name": "alpha", "prerelease": true }
+    ],
     "plugins": [
       "semantic-release-gitmoji",
       [
