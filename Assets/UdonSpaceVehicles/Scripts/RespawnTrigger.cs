@@ -1,4 +1,3 @@
-
 using UdonSharp;
 using UdonToolkit;
 using UnityEngine;
@@ -15,20 +14,19 @@ namespace UdonSpaceVehicles
     {
         #region Public Variables
         public Transform target;
-        public bool interactable = true;
-        public bool sendToOwner = true;
+        public bool networked = true;
         #endregion
 
         #region Internal Variables
         private Vector3 initialPosition;
         private Quaternion initialRotation;
-        private Rigidbody targetRigidbody;
+        private Rigidbody[] targetRigidbodies;
         #endregion
 
         #region Unity Events
         private void Start()
         {
-            targetRigidbody = target.GetComponent<Rigidbody>();
+            targetRigidbodies = target.GetComponentsInChildren<Rigidbody>();
             initialPosition = target.position;
             initialRotation = target.rotation;
         }
@@ -37,35 +35,21 @@ namespace UdonSpaceVehicles
         #region Udon Events
         public override void Interact()
         {
-            if (interactable) Trigger();
+            if (networked) SendCustomNetworkEvent(NetworkEventTarget.All, nameof(Trigger));
+            else Trigger();
         }
         #endregion
 
         #region Custom Events
         public void Trigger()
         {
-            if (sendToOwner && !Networking.IsOwner(target.gameObject))
-            {
-                SendCustomNetworkEvent(NetworkEventTarget.Owner, nameof(Trigger));
-                return;
-            }
-            else
-            {
-                if (targetRigidbody != null)
-                {
-                    targetRigidbody.velocity = Vector3.zero;
-                    targetRigidbody.angularVelocity = Vector3.zero;
-                }
-
-                target.position = initialPosition;
-                target.rotation = initialRotation;
-
-                if (targetRigidbody != null)
-                {
-                    targetRigidbody.Sleep();
-                }
+            foreach (var rigidbody in targetRigidbodies) {
+                rigidbody.velocity = Vector3.zero;
+                rigidbody.angularVelocity = Vector3.zero;
             }
 
+            target.position = initialPosition;
+            target.rotation = initialRotation;
         }
         #endregion
     }

@@ -13,11 +13,12 @@ namespace UdonSpaceVehicles
     public class ThrusterDriver : UdonSharpBehaviour
     {
         #region Public Variables
-        [SectionHeader("References")] [UTEditor] public RCSController rcsController;
+        [SectionHeader("References")] public VehicleRoot vehicleRoot;
+        public RCSController rcsController;
         public SyncManager syncManager;
         public uint syncManagerBank = 2u;
 
-        [Space] [SectionHeader("Configurations")] [UTEditor] public ConstantForce[] thrusters;
+        [Space] [SectionHeader("Configurations")]  public Transform[] thrusters;
         public float thrustPower = 20.0f;
         [Range(0.0f, 1.0f)] public float thrustThreshold = 0.1f;
         #endregion
@@ -37,15 +38,22 @@ namespace UdonSpaceVehicles
 
         private void SetThrust(int i, bool thrust)
         {
-            thrusters[i].relativeForce = thrust ? -Vector3.forward * thrustPower : Vector3.zero;
+            // thrusters[i].relativeForce = thrust ? -Vector3.forward * thrustPower : Vector3.zero;
+            if (thrust) {
+                var thruster = thrusters[i];
+                var worldForce = -thruster.forward * thrustPower;
+                rootRigidbody.AddForceAtPosition(worldForce, thruster.position, ForceMode.Force);
+            }
             SetThrustAnimation(i, thrust);
             syncManager.SetBool(syncManagerBank, i, thrust);
         }
         #endregion
 
         #region Unity Events
+        private Rigidbody rootRigidbody;
         private void Start()
         {
+            rootRigidbody = vehicleRoot.GetComponent<Rigidbody>();
             var center = transform.position;
 
             thrusterCount = thrusters.Length;
@@ -56,8 +64,8 @@ namespace UdonSpaceVehicles
             {
                 var thruster = thrusters[i];
 
-                var centerToThruster = (thruster.transform.position - center).normalized;
-                var thrusterForward = thruster.transform.TransformDirection(Vector3.forward);
+                var centerToThruster = (thruster.position - center).normalized;
+                var thrusterForward = thruster.TransformDirection(Vector3.forward);
                 thrusterRotationAxises[i] = transform.InverseTransformDirection(Vector3.Cross(thrusterForward, centerToThruster).normalized);
                 thrusterTranslationAxises[i] = -transform.InverseTransformDirection(thrusterForward.normalized);
 
@@ -145,7 +153,7 @@ namespace UdonSpaceVehicles
             Log("Deactivated");
         }
         #endregion
-        
+
         #region Logger
         private void Log(string log)
         {

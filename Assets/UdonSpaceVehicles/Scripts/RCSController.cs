@@ -14,20 +14,20 @@ namespace UdonSpaceVehicles
     {
         #region Public Variables
         [SectionHeader("Contoller Inputs")]
-        [UTEditor]
+
         public ControllerInput joystick;
         public ControllerInput throttle;
 
         [Space]
         [SectionHeader("Attitude Stabilizer")]
-        [UTEditor]
+
         public bool enableAttitudeStabilizer = true;
-        [RangeSlider(0.0f, 1.0f)] [UTEditor] public float rotationStabilizer = 1.0f;
-        [Horizontal("Rotation Filter")] [Toggle] [UTEditor] public bool stabilizeRotationX = true, stabilizeRotationY = true, stabilizeRotationZ = true;
-        [RangeSlider(0.0f, 1.0f)] [UTEditor] public float translationStabilizer = 0.7f;
-        [Horizontal("Translation Filter")] [Toggle] [UTEditor] public bool stabilizeTranslationX = true, stabilizeTranslationY = true, stabilizeTranslationZ = false;
-        [RangeSlider(0.0f, 1.0f)] [UTEditor] public float inputDeadZone = 0.1f;
-        [Horizontal("Feedback Gain")] [UTEditor] public float pGain = 100.0f; //, dGain = 0.0f;
+        [RangeSlider(0.0f, 1.0f)]  public float rotationStabilizer = 1.0f;
+        [Horizontal("Rotation Filter")] [Toggle]  public bool stabilizeRotationX = true, stabilizeRotationY = true, stabilizeRotationZ = true;
+        [RangeSlider(0.0f, 1.0f)]  public float translationStabilizer = 0.7f;
+        [Horizontal("Translation Filter")] [Toggle]  public bool stabilizeTranslationX = true, stabilizeTranslationY = true, stabilizeTranslationZ = false;
+        [RangeSlider(0.0f, 1.0f)]  public float inputDeadZone = 0.1f;
+        [Horizontal("Feedback Gain")]  public float pGain = 100.0f; //, dGain = 0.0f;
 
         [HideInInspector] public Vector3 rotation;
         [HideInInspector] public Vector3 translation;
@@ -120,7 +120,7 @@ namespace UdonSpaceVehicles
             Log("Deactivated");
         }
         #endregion
-        
+
         #region Logger
         private void Log(string log)
         {

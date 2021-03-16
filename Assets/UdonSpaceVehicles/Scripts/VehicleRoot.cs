@@ -15,7 +15,7 @@ namespace UdonSpaceVehicles
         #region Public Variables
         public SyncManager syncManager;
         public uint syncManagerBank = 0u;
-        [HelpBox("Updates bool parameter \"Power\"")][UTEditor] public Animator[] animators = {};
+        [HelpBox("Updates synced bool parameter \"Power\"")] public Animator[] animators = {};
         #endregion
 
         #region Logics
@@ -103,7 +103,7 @@ namespace UdonSpaceVehicles
             Debug.Log($"[{gameObject.name}] {log}");
         }
         #endregion
-        
+
         #region Value Packing
         private uint UnpackValue(uint packed, int byteOffset, uint bitmask)
         {

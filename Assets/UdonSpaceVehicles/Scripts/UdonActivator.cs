@@ -14,8 +14,8 @@ namespace UdonSpaceVehicles
     {
         #region Public Variables
         public bool autoIncludeChildren;
-        [SectionHeader("Target UdonBehaviours")] [UTEditor] public Component[] targets = { };
-        [Space] [SectionHeader("Configurations")] [UTEditor] public bool takeOwnership;
+        [SectionHeader("Target UdonBehaviours")]  public Component[] targets = { };
+        [Space] [SectionHeader("Configurations")]  public bool takeOwnership;
         #endregion
 
         #region Logics

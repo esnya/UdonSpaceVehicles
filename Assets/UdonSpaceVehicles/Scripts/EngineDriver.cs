@@ -13,14 +13,15 @@ namespace UdonSpaceVehicles
     public class EngineDriver : UdonSharpBehaviour
     {
         #region Public Variables
+        public VehicleRoot vehicleRoot;
         public ControllerInput controllerInput;
         public SyncManager syncManager;
         public uint syncManagerBank = 1u;
 
-        [ListView("Engines / Powers")][UTEditor] public ConstantForce[] engines = { };
-        [ListView("Engines / Powers")][UTEditor] public float[] powers = { };
-        [RangeSlider(0.0f, 1.0f)][UTEditor] public float remoteAnimationThreshold = 0.1f;
-        [HelpBox("Updates float parameter \"Engine Power\" with max value of engine powers.")][UTEditor] public Animator[] animators;
+        [ListView("Engines / Powers")] public Transform[] engines = { };
+        [ListView("Engines / Powers")] public float[] powers = { };
+        [RangeSlider(0.0f, 1.0f)] public float remoteAnimationThreshold = 0.1f;
+        [HelpBox("Updates float parameter \"Engine Power\" with max value of engine powers.")] public Animator[] animators;
         #endregion
 
         #region Logics
@@ -32,7 +33,9 @@ namespace UdonSpaceVehicles
 
         private void SetPower(int index, float power)
         {
-            engines[index].relativeForce = Vector3.forward * powers[index] * power;
+            var engine = engines[index];
+            var worldForce = engine.forward * powers[index] * power;
+            rootRigidbody.AddForceAtPosition(worldForce, engine.position, ForceMode.Force);
 
             SetAnimation(index, power);
             syncManager.SetBool(syncManagerBank, index, power > remoteAnimationThreshold);
@@ -46,11 +49,13 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Unity Events
+        Rigidbody rootRigidbody;
         int engineCount, animatorCount;
         Animator[] engineAnimators;
         Vector3[] axises;
         void Start()
         {
+            rootRigidbody = vehicleRoot.GetComponent<Rigidbody>();
             engineCount = Mathf.Min(engines.Length, powers.Length);
             animatorCount = animators.Length;
 
@@ -59,10 +64,10 @@ namespace UdonSpaceVehicles
             for (int i = 0; i < engineCount; i++)
             {
                 var engine = engines[i];
-                axises[i] = transform.InverseTransformVector(engine.transform.forward);
+                axises[i] = transform.InverseTransformVector(engine.forward);
 
                 var animator = engine.GetComponentInChildren<Animator>();
-                engineAnimators[i] = (animator == null) ? null : animator;
+                engineAnimators[i] = animator ?? null;
             }
 
             Log("Initialized");

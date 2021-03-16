@@ -14,17 +14,17 @@ namespace UdonSpaceVehicles
     public class ControllerInput : UdonSharpBehaviour
     {
         #region Public Variables
-        [Popup("GetModeList")] [UTEditor] public string mode = "Joystick";
+        [Popup("GetModeList")]  public string mode = "Joystick";
         bool joystick, slider;
 
-        [Space] [SectionHeader("VR Input")] [UTEditor] public VRCPlayerApi.TrackingDataType targetHand = VRCPlayerApi.TrackingDataType.RightHand;
+        [Space] [SectionHeader("VR Input")]  public VRCPlayerApi.TrackingDataType targetHand = VRCPlayerApi.TrackingDataType.RightHand;
         string gripAxis;
         public float gripThreshold = 0.75f;
-        [HelpBox("Maximum angle in degrees when joystick mode. Maximam distance in meters when slider mode.")] [UTEditor] public Vector3 maxValue = Vector3.one * 30.0f;
+        [HelpBox("Maximum angle in degrees when joystick mode. Maximam distance in meters when slider mode.")]  public Vector3 maxValue = Vector3.one * 30.0f;
         Vector3 inverseMaxValue;
-        [SectionHeader("Desktop Input")] [UTEditor] public string keymap = "w,s,e,q,a,d";
+        [SectionHeader("Desktop Input")]  public string keymap = "w,s,e,q,a,d";
 
-        [Space] [SectionHeader("UI")] [HelpBox("Updates float parameters. \"Pitch\", \"Yaw\" and \"Roll\" when joystick mode. \"Slider X\", \"Slider Y\" and \"Slider Z\" when slider mode.")] [UTEditor] public Animator[] animators;
+        [Space] [SectionHeader("UI")] [HelpBox("Updates float parameters. \"Pitch\", \"Yaw\" and \"Roll\" when joystick mode. \"Slider X\", \"Slider Y\" and \"Slider Z\" when slider mode.")]  public Animator[] animators;
 
         [HideInInspector] public Vector3 input;
         #endregion
