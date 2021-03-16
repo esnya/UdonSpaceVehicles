@@ -13,10 +13,11 @@ namespace UdonSpaceVehicles
     public class VehicleRoot : UdonSharpBehaviour
     {
         #region Public Variables
-        public SyncManager syncManager;
+        [SectionHeader("Sync")] public SyncManager syncManager;
         public uint syncManagerBank = 0u;
         [HelpBox("Updates synced bool parameter \"Power\"")] public Animator[] animators = { };
         #endregion
+        private const int Power = 0;
 
         #region Logics
         private void SetBool(string name, bool value)
@@ -29,17 +30,33 @@ namespace UdonSpaceVehicles
         {
             Log("Info", $"Power: {value}");
             power = value;
-            syncManager.SetBool(syncManagerBank, 0, value);
+            syncManager.SetBool(syncManagerBank, Power, value);
             SetBool("Power", value);
+        }
+
+        private void BroadcastCustomEvent(string eventName) {
+            foreach (var c in udonBehaviours) {
+                var udon = (UdonBehaviour)c;
+                if (udon == null || udon.gameObject == gameObject) continue;
+                udon.SendCustomEvent(eventName);
+            }
         }
         #endregion
 
         #region Unity Events
         private Rigidbody rootRigidbody;
+        private Vector3 initialPosition;
+        private Quaternion initialRotation;
+        private Component[] udonBehaviours;
         private void Start()
         {
             rootRigidbody = GetComponent<Rigidbody>();
-            Log("Info", "Initialized");
+            initialPosition = transform.localPosition;
+            initialRotation = transform.localRotation;
+
+            udonBehaviours = GetComponentsInChildren(typeof(UdonBehaviour));
+
+            Log("Info", $"Initialized with {udonBehaviours.Length - 1} child components");
         }
 
         private void Update()
@@ -60,11 +77,31 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Custom Events
+        public void Respawn()
+        {
+            rootRigidbody.velocity = Vector3.zero;
+            rootRigidbody.angularVelocity = Vector3.zero;
+            transform.localPosition = initialPosition;
+            transform.localRotation = initialRotation;
+
+            Deactivate();
+
+            BroadcastCustomEvent("_Respawned");
+
+            Log("Info", "Respawned");
+        }
+
         [HideInInspector] public uint syncValue, prevValue;
         public void _SyncValueChanged()
         {
             SetBool("Power", UnpackBool(syncValue, 0));
         }
+
+        public void _Hit()
+        {
+            BroadcastCustomEvent("_Hit");
+        }
+
         #endregion
 
         #region Activatable
@@ -79,9 +116,7 @@ namespace UdonSpaceVehicles
         public void Deactivate()
         {
             active = false;
-
             SetPower(false);
-
             Log("Info", "Deactivated");
         }
         #endregion

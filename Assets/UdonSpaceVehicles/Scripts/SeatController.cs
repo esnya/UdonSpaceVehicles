@@ -23,9 +23,13 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Logics
-        bool GetExitInput()
+        private bool GetExitInput()
         {
             return vr ? Input.GetButton(exitButton) : Input.GetKey(exitKey);
+        }
+
+        private void GetOut() {
+            station.ExitStation(Networking.LocalPlayer);
         }
         #endregion
 
@@ -45,7 +49,7 @@ namespace UdonSpaceVehicles
 
         private void Update()
         {
-            if (seated && GetExitInput()) station.ExitStation(Networking.LocalPlayer);
+            if (seated && GetExitInput()) GetOut();
         }
 
         private void LateUpdate()
@@ -106,6 +110,13 @@ namespace UdonSpaceVehicles
                 seated = false;
                 transform.localPosition = initialPosition;
             }
+        }
+        #endregion
+
+        #region Custom Events
+        public void _Respawned()
+        {
+            GetOut();
         }
         #endregion
 
