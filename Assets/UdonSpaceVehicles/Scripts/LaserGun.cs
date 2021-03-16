@@ -2,7 +2,6 @@
 using UdonSharp;
 using UdonToolkit;
 using UnityEngine;
-using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
 using VRC.Udon.Common.Interfaces;
@@ -41,12 +40,14 @@ namespace UdonSpaceVehicles
         {
             if (!active) return;
 
-            if (Time.frameCount % fireInterval == 0 && GetTrigger()) {
+            if (Time.frameCount % fireInterval == 0 && GetTrigger())
+            {
                 SendCustomNetworkEvent(NetworkEventTarget.All, nameof(Fire));
             }
         }
 
-        private void OnParticleCollision(GameObject other) {
+        private void OnParticleCollision(GameObject other)
+        {
             if (!active || other == null || vehicleRoot != null && other == vehicleRoot.gameObject) return;
             var udon = (UdonBehaviour)other.GetComponent(typeof(UdonBehaviour));
             if (udon == null) return;

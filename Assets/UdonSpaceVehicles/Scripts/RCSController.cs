@@ -3,9 +3,6 @@ using UdonSharp;
 using UdonToolkit;
 using UnityEngine;
 using UnityEngine.UI;
-using VRC.SDKBase;
-using VRC.Udon;
-using VRC.Udon.Common.Interfaces;
 
 namespace UdonSpaceVehicles
 {

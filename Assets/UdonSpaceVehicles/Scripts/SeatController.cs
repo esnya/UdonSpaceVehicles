@@ -2,10 +2,7 @@
 using UdonSharp;
 using UdonToolkit;
 using UnityEngine;
-using UnityEngine.UI;
 using VRC.SDKBase;
-using VRC.Udon;
-using VRC.Udon.Common.Interfaces;
 
 namespace UdonSpaceVehicles
 {
@@ -28,7 +25,8 @@ namespace UdonSpaceVehicles
             return vr ? Input.GetButton(exitButton) : Input.GetKey(exitKey);
         }
 
-        private void GetOut() {
+        private void GetOut()
+        {
             station.ExitStation(Networking.LocalPlayer);
         }
         #endregion
@@ -121,7 +119,7 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Logger
-        [Space][SectionHeader("Udon Logger")] public UdonLogger logger;
+        [Space] [SectionHeader("Udon Logger")] public UdonLogger logger;
         private void Log(string level, string message)
         {
             if (logger != null) logger.Log(level, gameObject.name, message);

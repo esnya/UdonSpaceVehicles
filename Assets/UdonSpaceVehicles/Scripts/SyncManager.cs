@@ -2,10 +2,7 @@
 using UdonSharp;
 using UdonToolkit;
 using UnityEngine;
-using UnityEngine.UI;
-using VRC.SDKBase;
 using VRC.Udon;
-using VRC.Udon.Common.Interfaces;
 
 namespace UdonSpaceVehicles
 {
@@ -19,19 +16,22 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Logics
-        private Object[] AppendObject(Object[] array, Object item) {
+        private Object[] AppendObject(Object[] array, Object item)
+        {
             var resized = new Object[array.Length + 1];
             System.Array.Copy(array, resized, array.Length);
             resized[array.Length] = item;
             return resized;
         }
-        private string[] AppendString(string[] array, string item) {
+        private string[] AppendString(string[] array, string item)
+        {
             var resized = new string[array.Length + 1];
             System.Array.Copy(array, resized, array.Length);
             resized[array.Length] = item;
             return resized;
         }
-        private uint[] AppendUint(uint[] array, uint item) {
+        private uint[] AppendUint(uint[] array, uint item)
+        {
             var resized = new uint[array.Length + 1];
             System.Array.Copy(array, resized, array.Length);
             resized[array.Length] = item;
@@ -41,7 +41,8 @@ namespace UdonSpaceVehicles
         private void SetSyncValue(uint bank, uint value)
         {
             // Log("Info", $"Set sync value bank:{bank} value:{value}");
-            switch (bank) {
+            switch (bank)
+            {
                 case 0:
                     syncValue0 = value;
                     break;
@@ -55,7 +56,8 @@ namespace UdonSpaceVehicles
         }
         private void SetPrevValue(uint bank, uint value)
         {
-            switch (bank) {
+            switch (bank)
+            {
                 case 0:
                     prevValue0 = value;
                     break;
@@ -69,7 +71,8 @@ namespace UdonSpaceVehicles
         }
         private uint GetSyncValue(uint bank)
         {
-            switch (bank) {
+            switch (bank)
+            {
                 case 0:
                     return syncValue0;
                 case 1:
@@ -81,7 +84,8 @@ namespace UdonSpaceVehicles
         }
         private uint GetPrevValue(uint bank)
         {
-            switch (bank) {
+            switch (bank)
+            {
                 case 0:
                     return prevValue0;
                 case 1:
@@ -128,9 +132,9 @@ namespace UdonSpaceVehicles
 
         #region Custom Events
         private int eventListenerCount;
-        private Component[] eventListeners = {};
-        private uint[] banks = {}, bitmaskList = {};
-        private string[] syncValueNames = {}, prevValueNames = {}, valueChangeEvents = {};
+        private Component[] eventListeners = { };
+        private uint[] banks = { }, bitmaskList = { };
+        private string[] syncValueNames = { }, prevValueNames = { }, valueChangeEvents = { };
         public void AddEventListener(UdonSharpBehaviour eventListener, uint bank, uint bitmask, string syncValueName, string prevValueName, string valueChangeEvent)
         {
             eventListeners = (Component[])AppendObject(eventListeners, eventListener);
@@ -142,7 +146,7 @@ namespace UdonSpaceVehicles
 
             eventListenerCount = eventListeners.Length;
 
-            Log("Info", $"{eventListener} listening bank:{bank} bitmask:{bitmask}");;
+            Log("Info", $"{eventListener} listening bank:{bank} bitmask:{bitmask}"); ;
         }
 
         public bool GetBool(uint bank, int byteOffset)
@@ -213,7 +217,7 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Logger
-        [Space][SectionHeader("Udon Logger")] public UdonLogger logger;
+        [Space] [SectionHeader("Udon Logger")] public UdonLogger logger;
         private void Log(string level, string message)
         {
             if (logger != null) logger.Log(level, gameObject.name, message);

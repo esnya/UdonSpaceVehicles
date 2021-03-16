@@ -15,18 +15,20 @@ namespace UdonSpaceVehicles
     {
         #region Public Variables
         public VehicleRoot vehicleRoot;
-        public Animator[] animators = {};
+        public Animator[] animators = { };
         public float maxHP = 3.0f;
         public AudioSource audioSource, audioSource2d;
         public AudioClip onHit, onDead;
         #endregion
 
         #region Logics
-        private void SetDamaged(bool value) {
+        private void SetDamaged(bool value)
+        {
             foreach (var animator in animators) animator.SetBool("Damaged", value);
         }
 
-        private void Dead() {
+        private void Dead()
+        {
             SendCustomNetworkEvent(NetworkEventTarget.All, nameof(PlayDeadSound));
             Log("Info", "Dead");
 
@@ -48,7 +50,8 @@ namespace UdonSpaceVehicles
         private uint syncManagerBank;
         public override void OnPlayerJoined(VRCPlayerApi player)
         {
-            if (player.isLocal) {
+            if (player.isLocal)
+            {
                 syncManager = vehicleRoot.syncManager;
                 syncManagerBank = vehicleRoot.syncManagerBank;
 
@@ -59,17 +62,20 @@ namespace UdonSpaceVehicles
 
         #region Custom Events
         private uint syncValue, prevValue;
-        void _OnSyncValueChanged() {
+        void _OnSyncValueChanged()
+        {
             SetDamaged(UnpackBool(syncValue, 1));
         }
 
-        public void _Respawned() {
+        public void _Respawned()
+        {
             hp = maxHP;
             SetDamaged(false);
             syncManager.SetBool(syncManagerBank, 1, false);
         }
 
-        public void _Hit() {
+        public void _Hit()
+        {
             AddDamage(1.0f);
         }
 

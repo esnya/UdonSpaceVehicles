@@ -2,10 +2,8 @@
 using UdonSharp;
 using UdonToolkit;
 using UnityEngine;
-using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
-using VRC.Udon.Common.Interfaces;
 
 namespace UdonSpaceVehicles
 {
@@ -34,8 +32,10 @@ namespace UdonSpaceVehicles
             SetBool("Power", value);
         }
 
-        private void BroadcastCustomEvent(string eventName) {
-            foreach (var c in udonBehaviours) {
+        private void BroadcastCustomEvent(string eventName)
+        {
+            foreach (var c in udonBehaviours)
+            {
                 var udon = (UdonBehaviour)c;
                 if (udon == null || udon.gameObject == gameObject) continue;
                 udon.SendCustomEvent(eventName);
