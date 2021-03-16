@@ -1,4 +1,5 @@
 
+using JetBrains.Annotations;
 using UdonSharp;
 using UdonToolkit;
 using UnityEngine;
@@ -14,14 +15,16 @@ namespace UdonSpaceVehicles
     {
         #region Public Variables
         public bool autoIncludeChildren;
-        [SectionHeader("Target UdonBehaviours")] public Component[] targets = { };
-        [Space] [SectionHeader("Configurations")] public bool takeOwnership;
+        public bool takeOwnership;
+        public GameObject[] targets = { };
+        [HelpBox("Update bool parameter \"Active\" locally.")] public Animator[] animators = { };
         #endregion
 
         #region Logics
         private void BroadcastActivation(bool active)
         {
             var localPlayer = Networking.LocalPlayer;
+
             foreach (var obj in targetUdons)
             {
                 if (obj == null) continue;
@@ -33,26 +36,20 @@ namespace UdonSpaceVehicles
 
                 udon.SendCustomEvent(active ? "Activate" : "Deactivate");
             }
+
+            foreach (var animator in animators) animator.SetBool("Active", active);
         }
         #endregion
 
         #region Unity Events
-        private Component[] targetUdons;
+        private Component[] targetUdons = {};
         private void Start()
         {
-            if (targets == null) targets = new Component[0];
+            var children = autoIncludeChildren ? (Component[])GetComponentsInChildren(typeof(UdonBehaviour)) : new Component[0];
 
-            var children = autoIncludeChildren ? (Component[])GetComponentsInChildren(typeof(UdonBehaviour)) : new Component[] { };
-
-            targetUdons = new Component[children.Length + targets.Length];
-            System.Array.Copy(children, targetUdons, children.Length);
-
-            for (int i = 0; i < targets.Length; i++)
-            {
-                var target = targets[i];
-                if (target == null) continue;
-                targetUdons[i] = target.GetComponent(typeof(UdonBehaviour));
-            }
+            targetUdons = new Component[targets.Length + children.Length];
+            for (int i = 0; i < targets.Length; i++) targetUdons[i] = targets[i].GetComponent(typeof(UdonBehaviour));
+            for (int i = 0; i < children.Length; i++) targetUdons[i + targets.Length] = children[i];
 
             Log("Info", $"Initialized with {targetUdons.Length} components");
         }

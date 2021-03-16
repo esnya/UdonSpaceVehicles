@@ -97,7 +97,7 @@ namespace UdonSpaceVehicles
             SetBool("Power", UnpackBool(syncValue, 0));
         }
 
-        public void _Hit()
+        public void Hit()
         {
             BroadcastCustomEvent("_Hit");
         }

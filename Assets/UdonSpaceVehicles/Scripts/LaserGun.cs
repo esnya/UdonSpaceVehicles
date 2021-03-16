@@ -51,7 +51,7 @@ namespace UdonSpaceVehicles
             if (!active || other == null || vehicleRoot != null && other == vehicleRoot.gameObject) return;
             var udon = (UdonBehaviour)other.GetComponent(typeof(UdonBehaviour));
             if (udon == null) return;
-            udon.SendCustomEvent("_Hit");
+            udon.SendCustomNetworkEvent(NetworkEventTarget.Owner, "Hit");
         }
         #endregion
 
