@@ -72,7 +72,7 @@ namespace UdonSpaceVehicles
                 thrusterAnimators[i] = thruster.GetComponentInChildren<Animator>();
             }
 
-            Log("Initialized");
+            Log("Info", "Initialized");
         }
 
         private void Update()
@@ -138,7 +138,7 @@ namespace UdonSpaceVehicles
         public void Activate()
         {
             active = true;
-            Log("Activated");
+            Log("Info", "Activated");
         }
 
         public void Dectivate()
@@ -150,14 +150,16 @@ namespace UdonSpaceVehicles
                 SetThrust(i, false);
             }
 
-            Log("Deactivated");
+            Log("Info", "Deactivated");
         }
         #endregion
 
         #region Logger
-        private void Log(string log)
+        [Space][SectionHeader("Udon Logger")] public UdonLogger logger;
+        private void Log(string level, string message)
         {
-            Debug.Log($"[{gameObject.name}] {log}");
+            if (logger != null) logger.Log(level, gameObject.name, message);
+            else Debug.Log($"{level} [{gameObject.name}] {message}");
         }
         #endregion
     }

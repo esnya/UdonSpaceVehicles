@@ -44,7 +44,7 @@ namespace UdonSpaceVehicles
         private void UpdateAnimatiors(float power)
         {
             foreach (var animator in animators) animator.SetFloat("Engine Power", power);
-            syncManager.SetBool(syncManagerBank,31, power > remoteAnimationThreshold);
+            syncManager.SetBool(syncManagerBank, 31, power > remoteAnimationThreshold);
         }
         #endregion
 
@@ -70,7 +70,7 @@ namespace UdonSpaceVehicles
                 engineAnimators[i] = animator ?? null;
             }
 
-            Log("Initialized");
+            Log("Info", "Initialized");
         }
 
         private void Update()
@@ -93,16 +93,19 @@ namespace UdonSpaceVehicles
         #region Udon Events
         public override void OnPlayerJoined(VRCPlayerApi player)
         {
-            if (player.isLocal) {
-                syncManager.AddEventListener(this, syncManagerBank,  ~0u, nameof(syncValue), nameof(prevValue), nameof(_SyncValueChanged));
+            if (player.isLocal)
+            {
+                syncManager.AddEventListener(this, syncManagerBank, ~0u, nameof(syncValue), nameof(prevValue), nameof(_SyncValueChanged));
             }
         }
         #endregion
 
         #region Custom Events
         [HideInInspector] public uint syncValue, prevValue;
-        public void _SyncValueChanged() {
-            for (int i = 0; i < engineCount; i++) {
+        public void _SyncValueChanged()
+        {
+            for (int i = 0; i < engineCount; i++)
+            {
                 var b = UnpackBool(syncValue, i);
                 if (b == UnpackBool(prevValue, i)) continue;
                 SetAnimation(i, b ? 100.0f : 0.0f);
@@ -119,7 +122,7 @@ namespace UdonSpaceVehicles
         {
             active = true;
 
-            Log("Activated");
+            Log("Info", "Activated");
         }
 
         public void Deactivate()
@@ -129,14 +132,16 @@ namespace UdonSpaceVehicles
             for (int i = 0; i < engineCount; i++) SetPower(i, 0.0f);
             UpdateAnimatiors(0.0f);
 
-            Log("Deactivated");
+            Log("Info", "Deactivated");
         }
         #endregion
 
         #region Logger
-        private void Log(string log)
+        [Space] [SectionHeader("Udon Logger")] public UdonLogger logger;
+        private void Log(string level, string message)
         {
-            Debug.Log($"[{gameObject.name}] {log}");
+            if (logger != null) logger.Log(level, gameObject.name, message);
+            else Debug.Log($"{level} [{gameObject.name}] {message}");
         }
         #endregion
 

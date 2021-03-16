@@ -40,7 +40,7 @@ namespace UdonSpaceVehicles
 
         private void SetSyncValue(uint bank, uint value)
         {
-            // Log($"Set sync value bank:{bank} value:{value}");
+            // Log("Info", $"Set sync value bank:{bank} value:{value}");
             switch (bank) {
                 case 0:
                     syncValue0 = value;
@@ -68,7 +68,7 @@ namespace UdonSpaceVehicles
             }
         }
         private uint GetSyncValue(uint bank)
-        { 
+        {
             switch (bank) {
                 case 0:
                     return syncValue0;
@@ -100,7 +100,7 @@ namespace UdonSpaceVehicles
         uint prevValue0, prevValue1, prevValue2;
         public override void OnDeserialization()
         {
-            // Log($"{syncValue0} {syncValue1} {syncValue2}");
+            // Log("Info", $"{syncValue0} {syncValue1} {syncValue2}");
             for (int i = 0; i < eventListenerCount; i++)
             {
                 var udon = (UdonBehaviour)eventListeners[i];
@@ -142,7 +142,7 @@ namespace UdonSpaceVehicles
 
             eventListenerCount = eventListeners.Length;
 
-            Log($"{eventListener} listening bank:{bank} bitmask:{bitmask}");;
+            Log("Info", $"{eventListener} listening bank:{bank} bitmask:{bitmask}");;
         }
 
         public bool GetBool(uint bank, int byteOffset)
@@ -151,7 +151,7 @@ namespace UdonSpaceVehicles
         }
         public void SetBool(uint bank, int byteOffset, bool value)
         {
-            // Log($"Set sync value bank:{bank} byteOffset:{value} value:{value}");
+            // Log("Info", $"Set sync value bank:{bank} byteOffset:{value} value:{value}");
             SetSyncValue(bank, PackBool(GetSyncValue(bank), byteOffset, value));
         }
 
@@ -196,26 +196,28 @@ namespace UdonSpaceVehicles
         }
         #endregion
 
-        
+
         #region Activatable
         bool active;
         public void Activate()
         {
             active = true;
-            Log("Activated");
+            Log("Info", "Activated");
         }
 
         public void Deactivate()
         {
             active = false;
-            Log("Deactivated");
+            Log("Info", "Deactivated");
         }
         #endregion
 
         #region Logger
-        private void Log(string log)
+        [Space][SectionHeader("Udon Logger")] public UdonLogger logger;
+        private void Log(string level, string message)
         {
-            Debug.Log($"[{gameObject.name}] {log}");
+            if (logger != null) logger.Log(level, gameObject.name, message);
+            else Debug.Log($"{level} [{gameObject.name}] {message}");
         }
         #endregion
     }

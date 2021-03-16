@@ -3,7 +3,8 @@
     "references": [
         "VRC.Udon",
         "UdonSharp.Runtime",
-        "UdonToolkitRuntime"
+        "UdonToolkitRuntime",
+        "Unity.TextMeshPro"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

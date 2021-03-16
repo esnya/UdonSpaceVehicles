@@ -15,41 +15,31 @@ namespace UdonSpaceVehicles
         #region Public Variables
         public SyncManager syncManager;
         public uint syncManagerBank = 0u;
-        [HelpBox("Updates synced bool parameter \"Power\"")] public Animator[] animators = {};
+        [HelpBox("Updates synced bool parameter \"Power\"")] public Animator[] animators = { };
         #endregion
 
         #region Logics
-        private void SetBool(string name, bool value) {
+        private void SetBool(string name, bool value)
+        {
             foreach (var animator in animators) animator.SetBool(name, value);
         }
 
         private bool power;
-        private void SetPower(bool value) {
-            Log($"Power: {value}");
+        private void SetPower(bool value)
+        {
+            Log("Info", $"Power: {value}");
             power = value;
             syncManager.SetBool(syncManagerBank, 0, value);
             SetBool("Power", value);
         }
-
-        private void SetKinematic(bool kinematic) {
-            var localPlayer = Networking.LocalPlayer;
-            foreach (var rigidbody in rigidbodies) {
-                if (rigidbody.gameObject != gameObject) {
-                    //rigidbody.isKinematic = kinematic;
-                    if (!kinematic) Networking.SetOwner(localPlayer, rigidbody.gameObject);
-                }
-            }
-        }
         #endregion
 
         #region Unity Events
-        private Rigidbody[] rigidbodies;
+        private Rigidbody rootRigidbody;
         private void Start()
         {
-            rigidbodies = GetComponentsInChildren<Rigidbody>();
-            SetKinematic(true);
-            Log("Initialized");
-            Log($"{rigidbodies.Length} rigidbodies");
+            rootRigidbody = GetComponent<Rigidbody>();
+            Log("Info", "Initialized");
         }
 
         private void Update()
@@ -62,7 +52,8 @@ namespace UdonSpaceVehicles
         #region Udon Events
         public override void OnPlayerJoined(VRCPlayerApi player)
         {
-            if (player.isLocal) {
+            if (player.isLocal)
+            {
                 syncManager.AddEventListener(this, syncManagerBank, 0x01u, nameof(syncValue), nameof(prevValue), nameof(_SyncValueChanged));
             }
         }
@@ -82,25 +73,25 @@ namespace UdonSpaceVehicles
         {
             active = true;
             Networking.SetOwner(Networking.LocalPlayer, syncManager.gameObject);
-            SetKinematic(false);
-            Log("Activated");
+            Log("Info", "Activated");
         }
 
         public void Deactivate()
         {
             active = false;
 
-            SetKinematic(true);
             SetPower(false);
 
-            Log("Deactivated");
+            Log("Info", "Deactivated");
         }
         #endregion
 
         #region Logger
-        private void Log(string log)
+        [Space] [SectionHeader("Udon Logger")] public UdonLogger logger;
+        private void Log(string level, string message)
         {
-            Debug.Log($"[{gameObject.name}] {log}");
+            if (logger != null) logger.Log(level, gameObject.name, message);
+            else Debug.Log($"{level} [{gameObject.name}] {message}");
         }
         #endregion
 

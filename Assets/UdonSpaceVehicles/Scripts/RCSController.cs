@@ -22,12 +22,12 @@ namespace UdonSpaceVehicles
         [SectionHeader("Attitude Stabilizer")]
 
         public bool enableAttitudeStabilizer = true;
-        [RangeSlider(0.0f, 1.0f)]  public float rotationStabilizer = 1.0f;
-        [Horizontal("Rotation Filter")] [Toggle]  public bool stabilizeRotationX = true, stabilizeRotationY = true, stabilizeRotationZ = true;
-        [RangeSlider(0.0f, 1.0f)]  public float translationStabilizer = 0.7f;
-        [Horizontal("Translation Filter")] [Toggle]  public bool stabilizeTranslationX = true, stabilizeTranslationY = true, stabilizeTranslationZ = false;
-        [RangeSlider(0.0f, 1.0f)]  public float inputDeadZone = 0.1f;
-        [Horizontal("Feedback Gain")]  public float pGain = 100.0f; //, dGain = 0.0f;
+        [RangeSlider(0.0f, 1.0f)] public float rotationStabilizer = 1.0f;
+        [Horizontal("Rotation Filter")] [Toggle] public bool stabilizeRotationX = true, stabilizeRotationY = true, stabilizeRotationZ = true;
+        [RangeSlider(0.0f, 1.0f)] public float translationStabilizer = 0.7f;
+        [Horizontal("Translation Filter")] [Toggle] public bool stabilizeTranslationX = true, stabilizeTranslationY = true, stabilizeTranslationZ = false;
+        [RangeSlider(0.0f, 1.0f)] public float inputDeadZone = 0.1f;
+        [Horizontal("Feedback Gain")] public float pGain = 100.0f; //, dGain = 0.0f;
 
         [HideInInspector] public Vector3 rotation;
         [HideInInspector] public Vector3 translation;
@@ -76,7 +76,7 @@ namespace UdonSpaceVehicles
             translationFilter = GetStabilizationFilter(stabilizeTranslationX, stabilizeTranslationY, stabilizeTranslationZ, translationStabilizer);
             rootRigidbody = GetComponentInParent<Rigidbody>();
 
-            Log("Initialized");
+            Log("Info", "Initialized");
         }
 
         private void Update()
@@ -107,7 +107,7 @@ namespace UdonSpaceVehicles
         {
             active = true;
 
-            Log("Activated");
+            Log("Info", "Activated");
         }
 
         public void Deactivate()
@@ -117,14 +117,16 @@ namespace UdonSpaceVehicles
             rotation = Vector3.zero;
             translation = Vector3.zero;
 
-            Log("Deactivated");
+            Log("Info", "Deactivated");
         }
         #endregion
 
         #region Logger
-        private void Log(string log)
+        [Space] [SectionHeader("Udon Logger")] public UdonLogger logger;
+        private void Log(string level, string message)
         {
-            Debug.Log($"[{gameObject.name}] {log}");
+            if (logger != null) logger.Log(level, gameObject.name, message);
+            else Debug.Log($"{level} [{gameObject.name}] {message}");
         }
         #endregion
     }

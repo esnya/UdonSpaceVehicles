@@ -14,8 +14,8 @@ namespace UdonSpaceVehicles
     {
         #region Public Variables
         public bool autoIncludeChildren;
-        [SectionHeader("Target UdonBehaviours")]  public Component[] targets = { };
-        [Space] [SectionHeader("Configurations")]  public bool takeOwnership;
+        [SectionHeader("Target UdonBehaviours")] public Component[] targets = { };
+        [Space] [SectionHeader("Configurations")] public bool takeOwnership;
         #endregion
 
         #region Logics
@@ -54,7 +54,7 @@ namespace UdonSpaceVehicles
                 targetUdons[i] = target.GetComponent(typeof(UdonBehaviour));
             }
 
-            Log($"Initialized with {targetUdons.Length} components");
+            Log("Info", $"Initialized with {targetUdons.Length} components");
         }
         #endregion
 
@@ -64,23 +64,25 @@ namespace UdonSpaceVehicles
         #region Activatable
         public void Activate()
         {
-            Log($"Activate {targetUdons.Length} components");
+            Log("Info", $"Activate {targetUdons.Length} components");
             BroadcastActivation(true);
-            Log("Activated");
+            Log("Info", "Activated");
         }
 
         public void Deactivate()
         {
-            Log($"Deactivated {targetUdons.Length} components");
+            Log("Info", $"Deactivate {targetUdons.Length} components");
             BroadcastActivation(false);
-            Log("Deactivated");
+            Log("Info", "Deactivated");
         }
         #endregion
 
         #region Logger
-        private void Log(string log)
+        [Space] [SectionHeader("Udon Logger")] public UdonLogger logger;
+        private void Log(string level, string message)
         {
-            Debug.Log($"[{gameObject.name}] {log}");
+            if (logger != null) logger.Log(level, gameObject.name, message);
+            else Debug.Log($"{level} [{gameObject.name}] {message}");
         }
         #endregion
     }

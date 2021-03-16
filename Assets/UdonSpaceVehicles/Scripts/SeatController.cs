@@ -40,7 +40,7 @@ namespace UdonSpaceVehicles
             triggerCollider = GetComponent<Collider>();
             initialPosition = transform.localPosition;
 
-            Log("Initialized");
+            Log("Info", "Initialized");
         }
 
         private void Update()
@@ -56,7 +56,7 @@ namespace UdonSpaceVehicles
                 var diff = Vector3.Scale(-headPosition, adjustorAxis);
                 transform.localPosition += diff;
                 adjusted = diff.magnitude <= adjustorThreshold;
-                Log($"Adjusting {diff}");
+                Log("Info", $"Adjusting {diff}");
             }
         }
         #endregion
@@ -68,7 +68,7 @@ namespace UdonSpaceVehicles
             if (player.isLocal)
             {
                 vr = player.IsUserInVR();
-                Log($"VR: {vr}");
+                Log("Info", $"VR: {vr}");
             }
         }
 
@@ -80,7 +80,7 @@ namespace UdonSpaceVehicles
         bool seated, adjusted;
         public override void OnStationEntered(VRCPlayerApi player)
         {
-            Log("Entered");
+            Log("Info", "Entered");
 
             triggerCollider.enabled = false;
 
@@ -95,7 +95,7 @@ namespace UdonSpaceVehicles
 
         public override void OnStationExited(VRCPlayerApi player)
         {
-            Log("Exited");
+            Log("Info", "Exited");
 
             triggerCollider.enabled = true;
 
@@ -108,11 +108,13 @@ namespace UdonSpaceVehicles
             }
         }
         #endregion
-        
+
         #region Logger
-        private void Log(string log)
+        [Space][SectionHeader("Udon Logger")] public UdonLogger logger;
+        private void Log(string level, string message)
         {
-            Debug.Log($"[{gameObject.name}] {log}");
+            if (logger != null) logger.Log(level, gameObject.name, message);
+            else Debug.Log($"{level} [{gameObject.name}] {message}");
         }
         #endregion
     }
