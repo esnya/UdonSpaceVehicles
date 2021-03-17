@@ -1,21 +1,14 @@
 fileFormatVersion: 2
-guid: e83c890fae9316f4ebdf72b05bfe4a35
+guid: 9baa1181463ff464bb1cd40b8598e010
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
     100000: //RootNode
     400000: //RootNode
-    2100000: HUD_Pitch
     2300000: //RootNode
     3300000: //RootNode
-    4300000: Pitch
-    4300002: PitchScale
+    4300000: DirectionScale
   externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: HUD_Pitch
-    second: {fileID: 2100000, guid: df6ce0e4b1ed76f4dbb22cc799af76de, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule

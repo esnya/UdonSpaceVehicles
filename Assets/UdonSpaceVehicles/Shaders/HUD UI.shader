@@ -30,18 +30,14 @@ Shader "Udon Space Vehicles/HUD UI"
 			Ref [_Stencil]
 			ReadMask [_StencilReadMask]
 			WriteMask [_StencilWriteMask]
-			CompFront Equal
-			PassFront Keep
-			FailFront Keep
-			ZFailFront Keep
-			CompBack Equal
-			PassBack Keep
-			FailBack Keep
-			ZFailBack Keep
+			Comp Equal
+			Pass Keep
+			Fail Keep
+			ZFail Keep
 		}
 
 
-		Cull Off
+		Cull Back
 		Lighting Off
 		ZWrite Off
 		ZTest Always
@@ -140,7 +136,7 @@ Shader "Udon Space Vehicles/HUD UI"
 }
 /*ASEBEGIN
 Version=18900
-0;1095;2234;985;1196.862;569.9946;1;True;True
-Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;15;465,-64;Float;False;True;-1;2;ASEMaterialInspector;0;4;Udon Space Vehicles/HUD UI;5056123faa0c79b47ab6ad7e8bf059a4;True;Default;0;0;Default;2;True;True;8;5;False;-1;1;False;-1;0;1;False;-1;0;False;-1;False;False;False;False;False;False;False;False;False;False;False;False;True;2;False;-1;False;True;True;True;True;True;0;True;-9;False;False;False;False;False;False;True;True;True;0;True;-5;255;True;-8;255;True;-7;5;False;-4;1;False;-6;1;False;-1;1;False;-1;5;False;-1;1;False;-1;1;False;-1;1;False;-1;True;True;2;False;-1;True;7;False;-11;False;True;5;Queue=Transparent=Queue=100;IgnoreProjector=True;RenderType=Transparent=RenderType;PreviewType=Plane;CanUseSpriteAtlas=True;False;0;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;2;0;;0;0;Standard;0;0;1;True;False;;False;0
+0;1362;1900;718;1029.862;436.4946;1;True;True
+Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;15;465,-64;Float;False;True;-1;2;ASEMaterialInspector;0;4;Udon Space Vehicles/HUD UI;5056123faa0c79b47ab6ad7e8bf059a4;True;Default;0;0;Default;2;True;True;8;5;False;-1;1;False;-1;0;1;False;-1;0;False;-1;False;False;False;False;False;False;False;False;False;False;False;True;True;0;False;-1;False;True;True;True;True;True;0;True;-9;False;False;False;False;False;False;True;True;True;0;True;-5;255;True;-8;255;True;-7;5;False;-4;1;False;-6;1;False;-1;1;False;-1;5;False;-1;1;False;-1;1;False;-1;1;False;-1;True;True;2;False;-1;True;7;False;-11;False;True;5;Queue=Transparent=Queue=100;IgnoreProjector=True;RenderType=Transparent=RenderType;PreviewType=Plane;CanUseSpriteAtlas=True;False;0;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;2;0;;0;0;Standard;0;0;1;True;False;;False;0
 ASEEND*/
-//CHKSM=81C5F235D4559B4EFC6B27CD172E3B39318C9DEB
+//CHKSM=8BB1D576C520E50769E106C274759341214F0837
