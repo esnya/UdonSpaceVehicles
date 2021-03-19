@@ -1,9 +1,8 @@
 node_modules
 node_modules.meta
-!/node_modules/node_modules.asmdef
-/Assets/UdonSpaceVehicles/Demo
 *.blend1*
 *.blend2*
+*.log
 
 # This .gitignore file should be placed at the root of your Unity project directory
 #

@@ -1,0 +1,9 @@
+[submodule "Assets/CyanEmu"]
+	path = Assets/CyanEmu
+	url = https://github.com/CyanLaser/CyanEmu.git
+[submodule "Assets/UdonToolkit"]
+	path = Assets/UdonToolkit
+	url = https://github.com/orels1/UdonToolkit.git
+[submodule "Assets/UdonSharp"]
+	path = Assets/UdonSharp
+	url = https://github.com/MerlinVR/UdonSharp.git
