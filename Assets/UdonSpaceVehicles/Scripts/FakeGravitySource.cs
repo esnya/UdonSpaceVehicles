@@ -1,25 +1,26 @@
-
+﻿
 using UdonSharp;
 using UdonToolkit;
 using UnityEngine;
 using VRC.SDKBase;
+using VRC.Udon;
 #if !COMPILER_UDONSHARP && UNITY_EDITOR
 using UdonSharpEditor;
 #endif
 
+
 namespace UdonSpaceVehicles
 {
-    [CustomName("USV Gravity Source")]
-    public class GravitySource : UdonSharpBehaviour
+    [CustomName("USV Fake Gravity Source")]
+    public class FakeGravitySource : UdonSharpBehaviour
     {
         #region Public Variables
         public bool active;
-        [Tooltip("kg")] public double mass = 5.972e+24;
-        //[Tooltip("m")] public Vector3 centerOffset = Vector3.down * 350000; // LEO
-        //[Tooltip("m/s")] public Vector3 velocityBias = Vector3.forward * 8000;
-        public float timeScale = 1.0f, lengthScale = 1.0f;
-        public Transform findTargetsFrom;
-        public bool ownerOnly;
+        [Tooltip("kg")] public float mass = 5.9726e+24f;
+        [Tooltip("m")] public Vector3 positionOffset = Vector3.down * 6728137;
+        [Tooltip("m/s")] public Vector3 velocityBias = Vector3.forward * 7990;
+        public GameObject findTargetsFrom;
+        public bool ownerOnly = true;
         #endregion
 
         #region Logics
@@ -28,23 +29,26 @@ namespace UdonSpaceVehicles
             return findTargetsFrom.GetComponentsInChildren<Rigidbody>();
         }
 
-        private Vector3 CalculateAccelaration(Rigidbody target)
+        Vector3 CalculateAccelaration(Rigidbody target)
         {
-            var diff = (transform.position/* + centerOffset*/ - target.position) * lengthScale;
-            var sqrR = diff.sqrMagnitude;
-            var a = (float)(gm / sqrR) * diff.normalized;
-            return a * (Mathf.Pow(timeScale, 2.0f) / lengthScale);
+            var v = target.velocity + velocityBias;
+            var r = target.position - (transform.position + positionOffset);
+            var sqrRadius = r.sqrMagnitude;
+            var w = 1 / sqrRadius * Vector3.Cross(r, v);
+            var ar = -Vector3.Cross(w, Vector3.Cross(w, r));
+            var g = -(gm / sqrRadius) * r.normalized;
+            return ar + g;
         }
         #endregion
 
         #region Unity Events
         private Rigidbody[] targets;
         private int targetCount;
-        private const double G = 6.67430e-11;
-        private double gm;
+        private const float G = 6.67430e-11f;
+        private float gm;
         private void Start()
         {
-            targets = GetTargets();
+            targets = findTargetsFrom.GetComponentsInChildren<Rigidbody>();
             targetCount = targets.Length;
 
             gm = G * mass;
@@ -57,23 +61,13 @@ namespace UdonSpaceVehicles
         {
             if (!active) return;
 
-            for (int i = 0; i < targetCount; i++)
+            foreach (var target in targets)
             {
-                var target = targets[i];
-                if (target.isKinematic || target.useGravity || ownerOnly && !Networking.IsOwner(target.gameObject)) continue;
+                if (ownerOnly && !Networking.IsOwner(target.gameObject)) continue;
 
                 target.AddForce(CalculateAccelaration(target), ForceMode.Acceleration);
             }
         }
-        #endregion
-
-        #region Udon Events
-        #endregion
-
-        #region Custom Events
-        #endregion
-
-        #region Internal Logics
         #endregion
 
         #region Activatable
@@ -103,11 +97,13 @@ namespace UdonSpaceVehicles
         private void OnDrawGizmos()
         {
             this.UpdateProxy();
+            if (findTargetsFrom == null) return;
+            gm = G * mass;
 
             Gizmos.color = Color.white;
             foreach (var target in GetTargets()) {
                 var a = CalculateAccelaration(target);
-                Gizmos.DrawRay(target.position, a * (lengthScale / Mathf.Pow(timeScale, 2.0f)));
+                Gizmos.DrawRay(target.position, a * 1.0f);
             }
         }
 #endif
