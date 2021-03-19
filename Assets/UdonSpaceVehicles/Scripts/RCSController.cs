@@ -3,6 +3,7 @@ using UdonSharp;
 using UdonToolkit;
 using UnityEngine;
 using UnityEngine.UI;
+using VRC.SDKBase;
 
 namespace UdonSpaceVehicles
 {
@@ -14,10 +15,10 @@ namespace UdonSpaceVehicles
 
         public ControllerInput joystick;
         public ControllerInput throttle;
+        public string vrTranslationButton = "Oculus_CrossPlatform_PrimaryIndexTrigger";
 
         [Space]
         [SectionHeader("Attitude Stabilizer")]
-
         public bool enableAttitudeStabilizer = true;
         [RangeSlider(0.0f, 1.0f)] public float rotationStabilizer = 1.0f;
         [Horizontal("Rotation Filter")] [Toggle] public bool stabilizeRotationX = true, stabilizeRotationY = true, stabilizeRotationZ = true;
@@ -25,6 +26,7 @@ namespace UdonSpaceVehicles
         [Horizontal("Translation Filter")] [Toggle] public bool stabilizeTranslationX = true, stabilizeTranslationY = true, stabilizeTranslationZ = false;
         [RangeSlider(0.0f, 1.0f)] public float inputDeadZone = 0.1f;
         [Horizontal("Feedback Gain")] public float pGain = 100.0f; //, dGain = 0.0f;
+
 
         [HideInInspector] public Vector3 rotation;
         [HideInInspector] public Vector3 translation;
@@ -57,10 +59,13 @@ namespace UdonSpaceVehicles
             );
         }
 
+        private readonly Vector3 joystickTranslationFilter = new Vector3(1, 1, 0);
         private void StabilizerUpdate()
         {
-            rotation = Stabilize(joystick.input, transform.InverseTransformVector(rootRigidbody.angularVelocity), rotationFilter);
-            translation = Stabilize(throttle.input, transform.InverseTransformVector(rootRigidbody.velocity), translationFilter);
+            var joystickInput=joystick.input;
+            var vrTranslate = vr && Input.GetAxis(vrTranslationButton) > 0.5f;
+            rotation = Stabilize(vrTranslate ? Vector3.Scale(joystickInput, Vector3.up) : joystickInput, transform.InverseTransformVector(rootRigidbody.angularVelocity), rotationFilter);
+            translation = Stabilize(vrTranslate ? (throttle.input - new Vector3(joystickInput.z, joystickInput.x, 0)) : throttle.input, transform.InverseTransformVector(rootRigidbody.velocity), translationFilter);
         }
         #endregion
 
@@ -89,6 +94,15 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Udon Events
+        private bool vr;
+        public override void OnPlayerJoined(VRCPlayerApi player)
+        {
+            if (player.isLocal)
+            {
+                vr = player.IsUserInVR();
+                Log("Info", $"VR: {vr}");
+            }
+        }
         #endregion
 
         #region Custom Events

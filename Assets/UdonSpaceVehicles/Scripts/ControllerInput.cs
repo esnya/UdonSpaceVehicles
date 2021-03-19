@@ -1,4 +1,5 @@
 
+using System;
 using UdonSharp;
 using UdonToolkit;
 using UnityEngine;
@@ -6,6 +7,9 @@ using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
 using VRC.Udon.Common.Interfaces;
+#if !COMPILER_UDONSHARP && UNITY_EDITOR
+using UdonSharpEditor;
+#endif
 
 namespace UdonSpaceVehicles
 {
@@ -17,14 +21,14 @@ namespace UdonSpaceVehicles
         [Popup("GetModeList")] public string mode = "Joystick";
         bool joystick, slider;
 
-        [Space] [SectionHeader("VR Input")] public VRCPlayerApi.TrackingDataType targetHand = VRCPlayerApi.TrackingDataType.RightHand;
+        [SectionHeader("VR Input")] public VRCPlayerApi.TrackingDataType targetHand = VRCPlayerApi.TrackingDataType.RightHand;
         string gripAxis;
         public float gripThreshold = 0.75f;
         [HelpBox("Maximum angle in degrees when joystick mode. Maximam distance in meters when slider mode.")] public Vector3 maxValue = Vector3.one * 30.0f;
         Vector3 inverseMaxValue;
         [SectionHeader("Desktop Input")] public string keymap = "w,s,e,q,a,d";
 
-        [Space] [SectionHeader("UI")] [HelpBox("Updates float parameters. \"Pitch\", \"Yaw\" and \"Roll\" when joystick mode. \"Slider X\", \"Slider Y\" and \"Slider Z\" when slider mode.")] public Animator[] animators;
+        [SectionHeader("UI")] [HelpBox("Updates float parameters. \"Pitch\", \"Yaw\" and \"Roll\" when joystick mode. \"Slider X\", \"Slider Y\" and \"Slider Z\" when slider mode.")] public Animator[] animators;
 
         [HideInInspector] public Vector3 input;
         #endregion
@@ -162,6 +166,30 @@ namespace UdonSpaceVehicles
         #endregion
 #if !COMPILER_UDONSHARP && UNITY_EDITOR
         string[] GetModeList() => new[] { "Joystick", "Slider" };
+
+        [Button("Preset: Joystick")] private void PresetJoystick()
+        {
+            this.UpdateProxy();
+
+            mode = "Joystick";
+            targetHand = VRCPlayerApi.TrackingDataType.RightHand;
+            maxValue = Vector3.one * 30.0f;
+            keymap = "w,s,e,q,a,d";
+
+            this.ApplyProxyModifications();
+        }
+
+        [Button("Preset: Throttle")] private void PresetThlottle()
+        {
+            this.UpdateProxy();
+
+            mode = "Slider";
+            targetHand = VRCPlayerApi.TrackingDataType.LeftHand;
+            maxValue = Vector3.one * 0.2f;
+            keymap = "l,h,j,k,left shift,left ctrl";
+
+            this.ApplyProxyModifications();
+        }
 #endif
 
 
@@ -181,7 +209,7 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Logger
-        [Space] [SectionHeader("Udon Logger")] public UdonLogger logger;
+        [SectionHeader("Udon Logger")] public UdonLogger logger;
         private void Log(string level, string message)
         {
             if (logger != null) logger.Log(level, gameObject.name, message);
