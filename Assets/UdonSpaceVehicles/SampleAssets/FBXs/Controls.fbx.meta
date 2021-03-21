@@ -1,0 +1,199 @@
+fileFormatVersion: 2
+guid: 5127480e9010a034598879a47c6e2c7c
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: Controller.L
+    100004: Controller.R
+    100006: Controls
+    100008: Controller_Exit
+    100010: Controller_Gun
+    100012: Controller_Joystick
+    100014: Controller_Parallel
+    100016: Controller_Throttle
+    100018: Keyboard
+    100020: Keyboard_Exit
+    100022: Keyboard_Gun
+    100024: Keyboard_Joystick
+    100026: Keyboard_Parallel
+    100028: Keyboard_Throttle
+    400000: //RootNode
+    400002: Controller.L
+    400004: Controller.R
+    400006: Controls
+    400008: Controller_Exit
+    400010: Controller_Gun
+    400012: Controller_Joystick
+    400014: Controller_Parallel
+    400016: Controller_Throttle
+    400018: Keyboard
+    400020: Keyboard_Exit
+    400022: Keyboard_Gun
+    400024: Keyboard_Joystick
+    400026: Keyboard_Parallel
+    400028: Keyboard_Throttle
+    2100000: Controller
+    2100002: Joystick
+    2100004: Parallel
+    2100006: Gun
+    2100008: Throttle
+    2100010: Exit
+    2300000: Controller.L
+    2300002: Controller.R
+    2300004: Controls
+    2300006: Controller_Exit
+    2300008: Controller_Gun
+    2300010: Controller_Joystick
+    2300012: Controller_Parallel
+    2300014: Controller_Throttle
+    2300016: Keyboard
+    2300018: Keyboard_Exit
+    2300020: Keyboard_Gun
+    2300022: Keyboard_Joystick
+    2300024: Keyboard_Parallel
+    2300026: Keyboard_Throttle
+    3300000: Controller.L
+    3300002: Controller.R
+    3300004: Controls
+    3300006: Controller_Exit
+    3300008: Controller_Gun
+    3300010: Controller_Joystick
+    3300012: Controller_Parallel
+    3300014: Controller_Throttle
+    3300016: Keyboard
+    3300018: Keyboard_Exit
+    3300020: Keyboard_Gun
+    3300022: Keyboard_Joystick
+    3300024: Keyboard_Parallel
+    3300026: Keyboard_Throttle
+    4300000: Controls
+    4300002: Controller.L
+    4300004: Controller.R
+    4300006: Keyboard
+    4300008: Keyboard_Exit
+    4300010: Keyboard_Joystick
+    4300012: Keyboard_Parallel
+    4300014: Keyboard_Gun
+    4300016: Keyboard_Throttle
+    4300018: Controller_Gun
+    4300020: Controller_Joystick
+    4300022: Controller_Exit
+    4300024: Controller_Throttle
+    4300026: Controller_Parallel
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Controller
+    second: {fileID: 2100000, guid: 4690829abb74a9f478c99088989a1edf, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Exit
+    second: {fileID: 2100000, guid: 00c4e74fdb4486a40abb0d0635bbc8fc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Gun
+    second: {fileID: 2100000, guid: 00c4e74fdb4486a40abb0d0635bbc8fc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Joystick
+    second: {fileID: 2100000, guid: 00c4e74fdb4486a40abb0d0635bbc8fc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Parallel
+    second: {fileID: 2100000, guid: 00c4e74fdb4486a40abb0d0635bbc8fc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Throttle
+    second: {fileID: 2100000, guid: 00c4e74fdb4486a40abb0d0635bbc8fc, type: 2}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 1
+    hasPreviousCalculatedGlobalScale: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
