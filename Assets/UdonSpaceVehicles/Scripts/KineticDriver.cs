@@ -54,6 +54,8 @@ namespace UdonSpaceVehicles
         {
             target.transform.localPosition = initialPosition;
             target.transform.localRotation = initialRotation;
+            target.velocity = Vector3.zero;
+            target.angularVelocity = Vector3.zero;
 
             if (onRespawn) Trigger();
         }

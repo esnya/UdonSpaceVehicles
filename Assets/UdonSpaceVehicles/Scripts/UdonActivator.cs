@@ -45,7 +45,7 @@ namespace UdonSpaceVehicles
         private Component[] targetUdons = {};
         private void Start()
         {
-            var children = autoIncludeChildren ? (Component[])GetComponentsInChildren(typeof(UdonBehaviour)) : new Component[0];
+            var children = autoIncludeChildren ? GetComponentsInChildren(typeof(UdonBehaviour), true) : new Component[0];
 
             targetUdons = new Component[targets.Length + children.Length];
             for (int i = 0; i < targets.Length; i++) targetUdons[i] = targets[i].GetComponent(typeof(UdonBehaviour));
@@ -74,10 +74,15 @@ namespace UdonSpaceVehicles
         }
         #endregion
 
+
         #region Logger
-        [Space] [SectionHeader("Udon Logger")] public UdonLogger logger;
+        [SectionHeader("Udon Logger")] public bool useGlobalLogger = false;
+        [HideIf("@useGlobalLogger")] public UdonLogger logger;
+
         private void Log(string level, string message)
         {
+            if (logger == null && useGlobalLogger) logger = (UdonLogger)GameObject.Find("_USV_Global_Logger_").GetComponent(typeof(UdonBehaviour));
+
             if (logger != null) logger.Log(level, gameObject.name, message);
             else Debug.Log($"{level} [{gameObject.name}] {message}");
         }

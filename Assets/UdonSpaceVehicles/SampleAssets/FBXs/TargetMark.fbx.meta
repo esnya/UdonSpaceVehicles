@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: cd3a2656a774420438c10fa8e0435bbe
+guid: bec5c1b217560344883c22c3dec9b8cc
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -8,13 +8,13 @@ ModelImporter:
     2100000: HUD_UI
     2300000: //RootNode
     3300000: //RootNode
-    4300000: HUDFixed
+    4300000: TargetMark
   externalObjects:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: HUD_UI_Green
-    second: {fileID: 2100000, guid: cd523bdfd39ed4e45bb97a2919376aaa, type: 2}
+      name: HUD_UI
+    second: {fileID: 2100000, guid: eed0c4c417e7b6d4eafd24a165185095, type: 2}
   materials:
     importMaterials: 1
     materialName: 0

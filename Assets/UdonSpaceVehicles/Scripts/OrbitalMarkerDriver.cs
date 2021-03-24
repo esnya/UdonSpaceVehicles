@@ -12,7 +12,8 @@ namespace UdonSpaceVehicles {
     [CustomName("USV Orbital Marker Driver")]
     public class OrbitalMarkerDriver : UdonSharpBehaviour
     {
-        public Rigidbody target;
+        public bool findTargetFromParent = true;
+        [HideIf("@findTargetFromParent")] public Rigidbody target;
 
         #region Orbital Object
         [SectionHeader("Orbital Settings")]
@@ -41,6 +42,11 @@ namespace UdonSpaceVehicles {
         #endregion
 
         #region Unity Events
+        private void Start()
+        {
+            if (findTargetFromParent) target = GetComponentInParent<Rigidbody>();
+        }
+
         private readonly Vector3 xzScaler = Vector3.one - Vector3.up;
         private void Update()
         {
