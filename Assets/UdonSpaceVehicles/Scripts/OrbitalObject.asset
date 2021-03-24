@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: OrbitalObject
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 6e135c9558561a642ac76616682cb545,
+  serializedUdonProgramAsset: {fileID: 11400000, guid: 245f27ed6ce0a5c40983b7a3baea609c,
     type: 2}
   udonAssembly: 
   assemblyError: 

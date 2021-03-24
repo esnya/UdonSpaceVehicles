@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: RCSController
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 5528d9ed4cad8c449ac63d93f230d248,
+  serializedUdonProgramAsset: {fileID: 11400000, guid: 430167e43cea85340a1f2442c8964d60,
     type: 2}
   udonAssembly: 
   assemblyError: 

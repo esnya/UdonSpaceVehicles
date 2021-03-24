@@ -3,6 +3,8 @@ using UdonSharp;
 using UdonToolkit;
 using UnityEngine;
 using VRC.SDKBase;
+using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
+using VRC.Udon;
 #if !COMPILER_UDONSHARP && UNITY_EDITOR
 using UdonSharpEditor;
 #endif
@@ -71,6 +73,15 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Custom Events
+        public void RespawnTargets()
+        {
+            foreach (var target in targets)
+            {
+                var udon = (UdonBehaviour)target.GetComponent(typeof(UdonBehaviour));
+                if (udon == null) continue;
+                udon.SendCustomEvent("Respawn");
+            }
+        }
         #endregion
 
         #region Internal Logics

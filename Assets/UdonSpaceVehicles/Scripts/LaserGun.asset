@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: LaserGun
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 72d9bbb7ed07de64d9d15dc402187a3b,
+  serializedUdonProgramAsset: {fileID: 11400000, guid: 79758dc25f00a43449e0e7cb1a97d35b,
     type: 2}
   udonAssembly: 
   assemblyError: 

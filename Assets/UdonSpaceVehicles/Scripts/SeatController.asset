@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: SeatController
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 660df1267c6ca4a4ca5692abc3a1fa7c,
+  serializedUdonProgramAsset: {fileID: 11400000, guid: 43e17d521cddbd948a4ef768324f54ba,
     type: 2}
   udonAssembly: 
   assemblyError: 

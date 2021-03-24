@@ -19,11 +19,16 @@ namespace UdonSpaceVehicles
         [Horizontal("Velocity")][Toggle] public bool setVelocity;
         [Horizontal("Velocity")][HideIf("@!setVelocity")] public Vector3 velocity;
         [Horizontal("Options")][Toggle] public bool localSpace, ownerOnly;
-        [Horizontal("Triggers")][Toggle] public bool onStart, onUpdate;
+        [Horizontal("Triggers")][Toggle] public bool onStart = true, onUpdate, onRespawn = true;
 
         public float timeScale = 1.0f, lengthScale = 1.0f;
 
+        private Vector3 initialPosition;
+        private Quaternion initialRotation;
         private void Start() {
+            initialPosition = target.transform.localPosition;
+            initialRotation = target.transform.localRotation;
+
             if (onStart) Trigger();
         }
 
@@ -43,6 +48,14 @@ namespace UdonSpaceVehicles
 
             if (addForce) target.AddForce(ConvertSpace(force) * timeScale * timeScale / lengthScale, ForceMode.Force);
             if (setVelocity) target.AddForce(ConvertSpace(velocity) * timeScale / lengthScale, ForceMode.VelocityChange);
+        }
+
+        public void Respawn()
+        {
+            target.transform.localPosition = initialPosition;
+            target.transform.localRotation = initialRotation;
+
+            if (onRespawn) Trigger();
         }
     }
 }
