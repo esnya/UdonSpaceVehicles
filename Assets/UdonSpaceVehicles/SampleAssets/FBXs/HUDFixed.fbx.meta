@@ -13,6 +13,11 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: HUD_UI
+    second: {fileID: 2100000, guid: eed0c4c417e7b6d4eafd24a165185095, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: HUD_UI_Green
     second: {fileID: 2100000, guid: cd523bdfd39ed4e45bb97a2919376aaa, type: 2}
   materials:

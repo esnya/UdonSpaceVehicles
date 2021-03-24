@@ -13,7 +13,11 @@ namespace UdonSpaceVehicles
         #region Public Variables
         [SectionHeader("Sync")] public SyncManager syncManager;
         public uint syncManagerBank = 0u;
-        [HelpBox("Updates synced bool parameter \"Power\"")] public Animator[] animators = { };
+        [HelpBox("Updates synced bool parameter \"Power\", sets trigger \"Collision\" on collision")] public Animator[] animators = { };
+
+        [ListView("On Collision Event Targets")] public UdonSharpBehaviour[] onCollisionTargets = {};
+        [ListView("On Collision Event Targets")] public string[] onCollisionVariableNames = {};
+        [ListView("On Collision Event Targets")][Popup("behaviour", "@onCollisionTargets", true)] public string[] onCollisionEventNames = {};
         #endregion
         private const int Power = 0;
 
@@ -21,6 +25,11 @@ namespace UdonSpaceVehicles
         private void SetBool(string name, bool value)
         {
             foreach (var animator in animators) animator.SetBool(name, value);
+        }
+
+        private void SetTrigger(string name)
+        {
+            foreach (var animator in animators) animator.SetTrigger(name);
         }
 
         private bool power;
@@ -48,6 +57,7 @@ namespace UdonSpaceVehicles
         private Vector3 initialPosition;
         private Quaternion initialRotation;
         private Component[] udonBehaviours;
+        private int onCollisionEventTargetCount;
         private void Start()
         {
             rootRigidbody = GetComponent<Rigidbody>();
@@ -56,6 +66,8 @@ namespace UdonSpaceVehicles
 
             udonBehaviours = GetComponentsInChildren(typeof(UdonBehaviour));
 
+            onCollisionEventTargetCount = Mathf.Min(onCollisionTargets.Length, Mathf.Min(onCollisionVariableNames.Length, onCollisionEventNames.Length));
+
             Log("Info", $"Initialized with {udonBehaviours.Length - 1} child components");
         }
 
@@ -63,6 +75,18 @@ namespace UdonSpaceVehicles
         {
             if (!active) return;
             if (!power && Networking.IsOwner(syncManager.gameObject)) SetPower(true);
+        }
+
+        private void OnCollisionEnter(Collision collision) {
+            if (!active) return;
+
+            for (int i = 0; i < onCollisionEventTargetCount; i++)
+            {
+                var u = onCollisionTargets[i];
+                if (u == null) continue;
+                u.SetProgramVariable(onCollisionVariableNames[i], collision);
+                u.SendCustomEvent(onCollisionEventNames[i]);
+            }
         }
         #endregion
 

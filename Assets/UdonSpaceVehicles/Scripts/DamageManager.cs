@@ -16,9 +16,10 @@ namespace UdonSpaceVehicles
         #region Public Variables
         public VehicleRoot vehicleRoot;
         public Animator[] animators = { };
-        public float maxHP = 3.0f;
+        public float maxHP = 5.0f;
+        public float collisionDamage = 0.01f;
         public AudioSource audioSource, audioSource2d;
-        public AudioClip onHit, onDead;
+        public AudioClip onHit, onDead, onCollision;
         #endregion
 
         #region Logics
@@ -41,6 +42,7 @@ namespace UdonSpaceVehicles
         private void Start()
         {
             hp = maxHP;
+            SetDamaged(false);
             Log("Info", "Initialized");
         }
         #endregion
@@ -62,7 +64,7 @@ namespace UdonSpaceVehicles
 
         #region Custom Events
         private uint syncValue, prevValue;
-        void _OnSyncValueChanged()
+        public void _OnSyncValueChanged()
         {
             SetDamaged(UnpackBool(syncValue, 1));
         }
@@ -76,7 +78,20 @@ namespace UdonSpaceVehicles
 
         public void _Hit()
         {
+            SendCustomNetworkEvent(NetworkEventTarget.All, nameof(PlayDamageSound));
             AddDamage(1.0f);
+        }
+
+        private Collision collision;
+        public void _OnCollision()
+        {
+            if (collision == null) return;
+
+            var damage = collision.impulse.magnitude * Time.fixedDeltaTime * collisionDamage;
+
+            if (damage > 0.2f) SendCustomNetworkEvent(NetworkEventTarget.All, nameof(PlayCollisionSound));
+
+            AddDamage(damage);
         }
 
         public void PlayDamageSound()
@@ -89,6 +104,11 @@ namespace UdonSpaceVehicles
             audioSource2d.PlayOneShot(onDead);
         }
 
+        public void PlayCollisionSound()
+        {
+            audioSource.PlayOneShot(onCollision);
+        }
+
         public void AddDamage(float damage)
         {
             if (!Networking.IsOwner(vehicleRoot.gameObject)) return;
@@ -97,11 +117,10 @@ namespace UdonSpaceVehicles
 
             if (damage >= 0.2f)
             {
-                SendCustomNetworkEvent(NetworkEventTarget.All, nameof(PlayDamageSound));
-                Log("Info", "Damaged");
+                Log("Info", $"Damaged {damage}");
             }
 
-            var damaged = damage <= Mathf.Max(1.0f, maxHP * 0.25f);
+            var damaged = hp <= Mathf.Max(1.0f, maxHP * 0.25f);
             SetDamaged(damaged);
             syncManager.SetBool(syncManagerBank, 1, damaged);
 

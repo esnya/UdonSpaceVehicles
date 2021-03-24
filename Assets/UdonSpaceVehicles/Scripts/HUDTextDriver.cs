@@ -103,8 +103,8 @@ namespace UdonSpaceVehicles
         private float CalcSpecificOrbitalEnergy() => CalcVelocity().sqrMagnitude / 2 - CalcStandardGravitionalParameter() / CalcPosition().y; // ε
         private float CalcSemiMajorAxis() => - CalcStandardGravitionalParameter() / (2 * CalcSpecificOrbitalEnergy()); // a
         private float CalcOrbitalEccentricity() => Mathf.Sqrt(1 + 2 * CalcSpecificOrbitalEnergy() * CalcSpecificAngularMomentum().sqrMagnitude / Mathf.Pow(CalcStandardGravitionalParameter(), 2)); // e
-        private float CalcPericenterAltitude() => (1 - CalcOrbitalEccentricity()) * CalcSemiMajorAxis() - positionBias.y; // r_per
-        private float CalcApocenterAltitude() => (1 + CalcOrbitalEccentricity()) * CalcSemiMajorAxis() - positionBias.y; // r_ap
+        private float CalcPericenterAltitude() => (1 - CalcOrbitalEccentricity()) * CalcSemiMajorAxis() - positionBias.y + altitudeBias; // r_per
+        private float CalcApocenterAltitude() => (1 + CalcOrbitalEccentricity()) * CalcSemiMajorAxis() - positionBias.y + altitudeBias; // r_ap
         #endregion
 
         #region Unity Events
