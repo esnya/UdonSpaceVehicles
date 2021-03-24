@@ -10,10 +10,13 @@ using VRC.Udon.Common.Interfaces;
 namespace UdonSpaceVehicles
 {
     [CustomName("USV Thruster Driver")]
+    [HelpMessage("Applies thruster force to the vehicle, and animate them.")]
     public class ThrusterDriver : UdonSharpBehaviour
     {
         #region Public Variables
-        [SectionHeader("References")] public VehicleRoot vehicleRoot;
+        [SectionHeader("References")]
+        public bool findTargetFromParent = true;
+        [HideIf("@findTargetFromParent")] public Rigidbody target;
         public RCSController rcsController;
         public SyncManager syncManager;
         public uint syncManagerBank = 2u;
@@ -42,7 +45,7 @@ namespace UdonSpaceVehicles
             if (thrust) {
                 var thruster = thrusters[i];
                 var worldForce = -thruster.forward * thrustPower;
-                rootRigidbody.AddForceAtPosition(worldForce, thruster.position, ForceMode.Force);
+                target.AddForceAtPosition(worldForce, thruster.position, ForceMode.Force);
             }
             SetThrustAnimation(i, thrust);
             syncManager.SetBool(syncManagerBank, i, thrust);
@@ -50,10 +53,9 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Unity Events
-        private Rigidbody rootRigidbody;
         private void Start()
         {
-            rootRigidbody = vehicleRoot.GetComponent<Rigidbody>();
+            if (findTargetFromParent) target = GetComponentInParent<Rigidbody>();
             var center = transform.position;
 
             thrusterCount = thrusters.Length;

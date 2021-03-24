@@ -10,15 +10,16 @@ using UdonSharpEditor;
 
 namespace UdonSpaceVehicles {
     [CustomName("USV Orbital Object")]
+    [HelpMessage("Simulates the gravitational force on an orbiting object.The xz plane will be projected as perpendicular to the orbital plane and y will be the altitude.")]
     public class OrbitalObject : UdonSharpBehaviour
     {
-        public Rigidbody target;
+        public bool findTargetFromParent = true;
+        [HideIf("@findTargetFromParent")] public Rigidbody target;
         public bool forceActive = true;
         public bool ownerOnly = true;
 
         [SectionHeader("Orbital Settings")]
         public bool useGlobalSettings = true;
-        [HideInInspector] public UdonBehaviour globalSettings;
         [HideIf("@useGlobalSettings")] public float planetMass;
         [HideIf("@useGlobalSettings")] public Vector3 positionBias;
         [HideIf("@useGlobalSettings")] public Vector3 velocityBias;
@@ -32,7 +33,7 @@ namespace UdonSpaceVehicles {
         {
             if (useGlobalSettings)
             {
-                globalSettings = (UdonBehaviour)GameObject.Find("_USV_Global_Settings_").GetComponent(typeof(UdonBehaviour));
+                var globalSettings = (UdonBehaviour)GameObject.Find("_USV_Global_Settings_").GetComponent(typeof(UdonBehaviour));
                 planetMass = (float)globalSettings.GetProgramVariable(nameof(GlobalSettings.planetMass));
                 positionBias = (Vector3)globalSettings.GetProgramVariable(nameof(GlobalSettings.positionBias));
                 velocityBias = (Vector3)globalSettings.GetProgramVariable(nameof(GlobalSettings.velocityBias));
@@ -58,6 +59,11 @@ namespace UdonSpaceVehicles {
         #endregion
 
         #region Unity Events
+        private void Start()
+        {
+            if (findTargetFromParent) target = GetComponentInParent<Rigidbody>();
+        }
+
         private void FixedUpdate()
         {
             if (!active || ownerOnly && !Networking.IsOwner(target.gameObject)) return;

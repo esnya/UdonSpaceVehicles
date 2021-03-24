@@ -6,8 +6,9 @@ using VRC.SDKBase;
 
 namespace UdonSpaceVehicles
 {
-    [RequireComponent(typeof(VRCStation))]
     [CustomName("USV Seat Controller")]
+    [HelpMessage("Controls the pilot seat. The vehicle is initially activated with this component.")]
+    [RequireComponent(typeof(VRCStation))]
     public class SeatController : UdonSharpBehaviour
     {
         #region Public Variables

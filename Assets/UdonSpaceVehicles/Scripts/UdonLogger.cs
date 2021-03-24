@@ -2,22 +2,27 @@
 using System;
 using TMPro;
 using UdonSharp;
+using UdonToolkit;
 using UnityEngine;
 
 namespace UdonSpaceVehicles
 {
+    [CustomName("USV Udon Logger")]
+    [HelpMessage("Formatted logger. Requires TMPro.TextMeshPro.")]
+    [RequireComponent(typeof(TextMeshPro))]
     public class UdonLogger : UdonSharpBehaviour
     {
         #region Public Variables
-        public TextMeshPro text;
         public int maxLines = 20;
         #endregion
 
         #region Unity Events
+        private TextMeshPro text;
         private string logs = "";
         private bool initialized = false;
         private void Start()
         {
+            text = GetComponent<TextMeshPro>();
             initialized = true;
             Log("Info", gameObject.name, "Initialized");
         }

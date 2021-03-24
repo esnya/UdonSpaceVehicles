@@ -40,7 +40,6 @@ using UdonSharpEditor;
 namespace UdonSpaceVehicles {
     [CustomName("USV Global Settings")]
     [HelpMessage("Put as a single GameObject named \"_USV_Global_Settings_\" to provide global setting values for other components.")]
-    // [OnValuesChanged("PreCompute")]
     public class GlobalSettings : UdonSharpBehaviour
     {
         #region Public Variables

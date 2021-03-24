@@ -10,7 +10,7 @@ using VRC.Udon.Common.Interfaces;
 
 namespace UdonSpaceVehicles
 {
-    [CustomName("USV Udon Activator")]
+    [CustomName("USV Udon Activator")][HelpMessage("Activates and takes ownership activatable components. Targets can be retrieved from children and their children.")]
     public class UdonActivator : UdonSharpBehaviour
     {
         #region Public Variables

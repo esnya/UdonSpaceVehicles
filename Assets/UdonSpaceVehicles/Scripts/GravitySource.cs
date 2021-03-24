@@ -3,7 +3,6 @@ using UdonSharp;
 using UdonToolkit;
 using UnityEngine;
 using VRC.SDKBase;
-using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using VRC.Udon;
 #if !COMPILER_UDONSHARP && UNITY_EDITOR
 using UdonSharpEditor;
@@ -12,13 +11,12 @@ using UdonSharpEditor;
 namespace UdonSpaceVehicles
 {
     [CustomName("USV Gravity Source")]
+    [HelpMessage("Adds an unprojected gravitational force to target objects. Time and length can be scaled.")]
     public class GravitySource : UdonSharpBehaviour
     {
         #region Public Variables
         public bool active;
         [Tooltip("kg")] public double mass = 5.972e+24;
-        //[Tooltip("m")] public Vector3 centerOffset = Vector3.down * 350000; // LEO
-        //[Tooltip("m/s")] public Vector3 velocityBias = Vector3.forward * 8000;
         public float timeScale = 1.0f, lengthScale = 1.0f;
         public Transform findTargetsFrom;
         public bool ownerOnly;
@@ -102,9 +100,13 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Logger
-        [SectionHeader("Udon Logger")] public UdonLogger logger;
+        [SectionHeader("Udon Logger")] public bool useGlobalLogger = false;
+        [HideIf("@useGlobalLogger")] public UdonLogger logger;
+
         private void Log(string level, string message)
         {
+            if (logger == null && useGlobalLogger) logger = (UdonLogger)GameObject.Find("_USV_Global_Logger_").GetComponent(typeof(UdonBehaviour));
+
             if (logger != null) logger.Log(level, gameObject.name, message);
             else Debug.Log($"{level} [{gameObject.name}] {message}");
         }

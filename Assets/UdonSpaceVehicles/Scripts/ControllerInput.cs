@@ -14,7 +14,7 @@ using UdonSharpEditor;
 namespace UdonSpaceVehicles
 {
     [CustomName("USV Controller Input")]
-    [HelpMessage("Simulates joystick (Pitch, Yaw, Roll) or slider (X,Y,Z) input.")]
+    [HelpMessage("Simulates joystick (Pitch, Yaw, Roll) and slider (X, Y, Z) input.")]
     public class ControllerInput : UdonSharpBehaviour
     {
         #region Public Variables
@@ -209,9 +209,13 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Logger
-        [SectionHeader("Udon Logger")] public UdonLogger logger;
+        [SectionHeader("Udon Logger")] public bool useGlobalLogger = false;
+        [HideIf("@useGlobalLogger")] public UdonLogger logger;
+
         private void Log(string level, string message)
         {
+            if (logger == null && useGlobalLogger) logger = (UdonLogger)GameObject.Find("_USV_Global_Logger_").GetComponent(typeof(UdonBehaviour));
+
             if (logger != null) logger.Log(level, gameObject.name, message);
             else Debug.Log($"{level} [{gameObject.name}] {message}");
         }

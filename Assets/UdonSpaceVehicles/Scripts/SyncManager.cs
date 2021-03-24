@@ -6,6 +6,7 @@ using VRC.Udon;
 
 namespace UdonSpaceVehicles
 {
+    [CustomName("USV Sync Manager")][HelpMessage("Provides synchronized values to USV components.")]
     public class SyncManager : UdonSharpBehaviour
     {
         #region Public Variables

@@ -8,6 +8,7 @@ using VRC.SDKBase;
 namespace UdonSpaceVehicles
 {
     [CustomName("USV RCS Controller")]
+    [HelpMessage("Controls RCS (Reaction Control System) such as thrusters. Two Controller Inputs are required: joystick and throttle.")]
     public class RCSController : UdonSharpBehaviour
     {
         #region Public Variables

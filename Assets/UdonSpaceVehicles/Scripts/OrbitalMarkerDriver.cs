@@ -10,6 +10,7 @@ using UdonSharpEditor;
 
 namespace UdonSpaceVehicles {
     [CustomName("USV Orbital Marker Driver")]
+    [HelpMessage("Rotates the attached object according to the direction of the orbit.")]
     public class OrbitalMarkerDriver : UdonSharpBehaviour
     {
         public bool findTargetFromParent = true;
@@ -23,7 +24,6 @@ namespace UdonSpaceVehicles {
         [HideIf("@useGlobalSettings")] public Vector3 positionBias;
         [HideIf("@useGlobalSettings")] public Vector3 velocityBias;
         [HideIf("@useGlobalSettings")] public float G = 6.67430e-11f;
-        private float planetCoG;
 
         private void OrbitalObject_Activate()
         {
@@ -37,7 +37,6 @@ namespace UdonSpaceVehicles {
                 velocityBias = (Vector3)globalSettings.GetProgramVariable(nameof(GlobalSettings.velocityBias));
                 G = (float)globalSettings.GetProgramVariable(nameof(GlobalSettings.G));
             }
-            planetCoG = G * planetMass;
         }
         #endregion
 

@@ -1,4 +1,5 @@
 ﻿
+using BestHTTP.SecureProtocol.Org.BouncyCastle.Asn1.X509;
 using UdonSharp;
 using UdonToolkit;
 using UnityEngine;
@@ -9,10 +10,11 @@ using VRC.Udon.Common.Interfaces;
 
 namespace UdonSpaceVehicles
 {
-    [CustomName("Kinetic Driver")][HelpMessage("Add or set force or velocity when custom event \"Trigger\" received.")]
+    [CustomName("Kinetic Driver")]
+    [HelpMessage("Add or set force or velocity when custom event \"Trigger\" received to attached Rigidbody.")]
+    [RequireComponent(typeof(Rigidbody))]
     public class KineticDriver : UdonSharpBehaviour
     {
-        public Rigidbody target;
         [Horizontal("Force")][Toggle] public bool addForce;
         [Horizontal("Force")][HideIf("@!addForce")] public Vector3 force;
 
@@ -22,10 +24,11 @@ namespace UdonSpaceVehicles
         [Horizontal("Triggers")][Toggle] public bool onStart = true, onUpdate, onRespawn = true;
 
         public float timeScale = 1.0f, lengthScale = 1.0f;
-
+        private Rigidbody target;
         private Vector3 initialPosition;
         private Quaternion initialRotation;
         private void Start() {
+            target = GetComponent<Rigidbody>();
             initialPosition = target.transform.localPosition;
             initialRotation = target.transform.localRotation;
 

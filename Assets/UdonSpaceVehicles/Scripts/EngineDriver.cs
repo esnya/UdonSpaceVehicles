@@ -7,10 +7,12 @@ using VRC.SDKBase;
 namespace UdonSpaceVehicles
 {
     [CustomName("USV Engine Driver")]
+    [HelpMessage("Applies the power of the main engine and animates  The ControllerInput is required as a throttle.")]
     public class EngineDriver : UdonSharpBehaviour
     {
         #region Public Variables
-        public VehicleRoot vehicleRoot;
+        public bool findTargetFromParent = true;
+        [HideIf("@findTargetFromParent")] public Rigidbody target;
         public ControllerInput controllerInput;
         public SyncManager syncManager;
         public uint syncManagerBank = 1u;
@@ -32,7 +34,7 @@ namespace UdonSpaceVehicles
         {
             var engine = engines[index];
             var worldForce = engine.forward * powers[index] * power;
-            rootRigidbody.AddForceAtPosition(worldForce, engine.position, ForceMode.Force);
+            target.AddForceAtPosition(worldForce, engine.position, ForceMode.Force);
 
             SetAnimation(index, power);
             syncManager.SetBool(syncManagerBank, index, power > remoteAnimationThreshold);
@@ -46,13 +48,12 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Unity Events
-        Rigidbody rootRigidbody;
         int engineCount, animatorCount;
         Animator[] engineAnimators;
         Vector3[] axises;
         void Start()
         {
-            rootRigidbody = vehicleRoot.GetComponent<Rigidbody>();
+            if (findTargetFromParent) target = GetComponentInParent<Rigidbody>();
             engineCount = Mathf.Min(engines.Length, powers.Length);
             animatorCount = animators.Length;
 

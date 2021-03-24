@@ -12,12 +12,13 @@ using UdonSharpEditor;
 
 namespace UdonSpaceVehicles
 {
-    [CustomName("USV HUD Text Driver")][OnAfterEditor("OnAfterEditor")]
+    [CustomName("USV HUD Text Driver")]
+    [HelpMessage("Drives text for the instruments.")]
+    [RequireComponent(typeof(TextMeshPro))]
     public class HUDTextDriver : UdonSharpBehaviour
     {
 
         #region Public Variables
-        [SectionHeader("References")] public TextMeshPro text;
         public bool findTargetFromParent = true;
         [HideIf("@findTargetFromParent")] public Rigidbody target;
         [SectionHeader("Mode")][Popup("GetModes")] public string mode;
@@ -74,9 +75,11 @@ namespace UdonSpaceVehicles
             "Apocenter Altitude",   "m",    "f0",
         };
         private string format = "f";
-
+        private TextMeshPro text;
         private void Initialize()
         {
+            text = GetComponent<TextMeshPro>();
+
             var table = GetModeTable();
             for (int i = 0; i < table.Length / 3; i++) {
                 if (mode == table[i * 3]) {
@@ -188,11 +191,6 @@ namespace UdonSpaceVehicles
         private bool HideForward() => mode != "Speed";
         private bool HideAxis() => mode != "Axis Speed";
         private bool HidePositionOffset() => mode != "Altitude";
-
-        private void OnAfterEditor() {
-            this.UpdateProxy();
-            Initialize();
-        }
 #endif
     }
 }

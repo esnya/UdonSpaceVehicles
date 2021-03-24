@@ -10,7 +10,8 @@ using VRC.Udon.Common.Interfaces;
 
 namespace UdonSpaceVehicles
 {
-
+    [CustomName("USV Damage Manager")]
+    [HelpMessage("Manages vehicle damage.")]
     public class DamageManager : UdonSharpBehaviour
     {
         #region Public Variables
