@@ -18,8 +18,6 @@ namespace UdonSpaceVehicles
         public bool findTargetFromParent = true;
         [HideIf("@findTargetFromParent")] public Rigidbody target;
         public RCSController rcsController;
-        public SyncManager syncManager;
-        public uint syncManagerBank = 2u;
 
         [Space] [SectionHeader("Configurations")]  public Transform[] thrusters;
         public float thrustPower = 20.0f;
@@ -30,25 +28,25 @@ namespace UdonSpaceVehicles
         private int thrusterCount;
         private Vector3[] thrusterRotationAxises, thrusterTranslationAxises;
         private Animator[] thrusterAnimators;
+        [UdonSynced] private uint syncValue;
         #endregion
 
         #region Logics
         private void SetThrustAnimation(int i, bool thrust) {
-
             if (thrusterAnimators[i] == null) return;
             thrusterAnimators[i].SetFloat("Power", thrust ? 1 : 0);
         }
 
         private void SetThrust(int i, bool thrust)
         {
-            // thrusters[i].relativeForce = thrust ? -Vector3.forward * thrustPower : Vector3.zero;
             if (thrust) {
                 var thruster = thrusters[i];
                 var worldForce = -thruster.forward * thrustPower;
                 target.AddForceAtPosition(worldForce, thruster.position, ForceMode.Force);
             }
             SetThrustAnimation(i, thrust);
-            syncManager.SetBool(syncManagerBank, i, thrust);
+            syncValue = PackBool(syncValue, i, thrust);
+            Debug.Log(syncValue);
         }
         #endregion
 
@@ -96,43 +94,39 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Udon Events
-        public override void OnPlayerJoined(VRCPlayerApi player) {
-            if (player.isLocal) {
-                syncManager.AddEventListener(this, syncManagerBank, ~0u, nameof(syncValue), nameof(prevValue), nameof(_SyncValueChanged));
+        private uint prevValue;
+        public override void OnDeserialization()
+        {
+            if (syncValue == prevValue) return;
+            for (int i = 0; i < thrusterCount; i++) {
+                var thrust = UnpackBool(syncValue, i);
+                if (thrust == UnpackBool(prevValue, i)) continue;
+                SetThrustAnimation(i, thrust);
             }
+            prevValue = syncValue;
         }
         #endregion
 
-        #region Custom Events
-        [HideInInspector] public uint syncValue, prevValue;
-        public void _SyncValueChanged()
-        {
-            for (int i = 0; i < thrusterCount; i++) {
-                var b = UnpackBool(syncValue, i);
-                if (b != UnpackBool(prevValue, i)) SetThrustAnimation(i, b);
-            }
-        }
-        #endregion
 
         #region Value Packer
-        uint UnpackValue(uint packed, int bitOffset, uint bitmask)
+        private uint UnpackValue(uint packed, int byteOffset, uint bitmask)
         {
-            return (packed >> bitOffset & bitmask);
+            return (packed >> byteOffset) & bitmask;
         }
-        uint PackValue(uint packed, int bitOffset, uint bitmask, uint value)
+        private uint PackValue(uint packed, int byteOffset, uint bitmask, uint value)
         {
-            var mask = bitmask << bitOffset;
-            return packed & mask | value & bitmask << bitOffset;
+            return packed & ~(bitmask << byteOffset) | (value & bitmask) << byteOffset;
         }
 
-        bool UnpackBool(uint packed, int bitOffset)
+        private bool UnpackBool(uint packed, int byteOffset)
         {
-            return UnpackValue(packed, bitOffset, 0x01) != 0;
+            return UnpackValue(packed, byteOffset, 0x01) != 0;
         }
-        uint PackBool(uint packed, int bitOffset, bool value)
+        private uint PackBool(uint packed, int byteOffset, bool value)
         {
-            return PackValue(packed, bitOffset, 0x1, value ? 1u : 0u);
+            return PackValue(packed, byteOffset, 0x1, value ? 1u : 0u);
         }
+
         #endregion
 
         #region Activatable

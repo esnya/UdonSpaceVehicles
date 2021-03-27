@@ -8,13 +8,11 @@ using VRC.Udon;
 namespace UdonSpaceVehicles
 {
     [CustomName("USV Vehicle Root")]
-    [HelpMessage("Manages collisions, and respawns, vehicle power states. Attach to the root game object with a Rigidbody.")]
+    [HelpMessage("Manages collisions, and respawns, vehicle syncPower states. Attach to the root game object with a Rigidbody.")]
     [RequireComponent(typeof(Rigidbody))]
     public class VehicleRoot : UdonSharpBehaviour
     {
         #region Public Variables
-        [SectionHeader("Sync")] public SyncManager syncManager;
-        public uint syncManagerBank = 0u;
         [HelpBox("Updates synced bool parameter \"Power\", sets trigger \"Collision\" on collision")] public Animator[] animators = { };
 
         [ListView("On Collision Event Targets")] public UdonSharpBehaviour[] onCollisionTargets = {};
@@ -34,12 +32,11 @@ namespace UdonSpaceVehicles
             foreach (var animator in animators) animator.SetTrigger(name);
         }
 
-        private bool power;
+        [UdonSynced] private bool syncPower;
         private void SetPower(bool value)
         {
             Log("Info", $"Power: {value}");
-            power = value;
-            syncManager.SetBool(syncManagerBank, Power, value);
+            syncPower = value;
             SetBool("Power", value);
         }
 
@@ -76,7 +73,7 @@ namespace UdonSpaceVehicles
         private void Update()
         {
             if (!active) return;
-            if (!power && Networking.IsOwner(syncManager.gameObject)) SetPower(true);
+            if (!syncPower && Networking.IsOwner(gameObject)) SetPower(true);
         }
 
         private void OnCollisionEnter(Collision collision) {
@@ -93,12 +90,12 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Udon Events
-        public override void OnPlayerJoined(VRCPlayerApi player)
+        private bool prevPower;
+        public override void OnDeserialization()
         {
-            if (player.isLocal)
-            {
-                syncManager.AddEventListener(this, syncManagerBank, 0x01u, nameof(syncValue), nameof(prevValue), nameof(_SyncValueChanged));
-            }
+            if (prevPower == syncPower) return;
+            SetBool("Power", syncPower);
+            prevPower = syncPower;
         }
         #endregion
 
@@ -117,12 +114,6 @@ namespace UdonSpaceVehicles
             Log("Info", "Respawned");
         }
 
-        [HideInInspector] public uint syncValue, prevValue;
-        public void _SyncValueChanged()
-        {
-            SetBool("Power", UnpackBool(syncValue, 0));
-        }
-
         public void Hit()
         {
             BroadcastCustomEvent("_Hit");
@@ -135,7 +126,6 @@ namespace UdonSpaceVehicles
         public void Activate()
         {
             active = true;
-            Networking.SetOwner(Networking.LocalPlayer, syncManager.gameObject);
             Log("Info", "Activated");
         }
 
@@ -153,37 +143,6 @@ namespace UdonSpaceVehicles
         {
             if (logger != null) logger.Log(level, gameObject.name, message);
             else Debug.Log($"{level} [{gameObject.name}] {message}");
-        }
-        #endregion
-
-        #region Value Packing
-        private uint UnpackValue(uint packed, int byteOffset, uint bitmask)
-        {
-            return (packed >> byteOffset & bitmask);
-        }
-        private uint PackValue(uint packed, int byteOffset, uint bitmask, uint value)
-        {
-            var mask = bitmask << byteOffset;
-            return packed & mask | value & bitmask << byteOffset;
-        }
-
-        private bool UnpackBool(uint packed, int byteOffset)
-        {
-            return UnpackValue(packed, byteOffset, 0x01) != 0;
-        }
-        private uint PackBool(uint packed, int byteOffset, bool value)
-        {
-            return PackValue(packed, byteOffset, 0x1, value ? 1u : 0u);
-        }
-
-        private byte UnpackByte(uint packed, int byteOffset)
-        {
-            return (byte)UnpackValue(packed, byteOffset, 0xff);
-        }
-
-        private uint PackByte(uint packed, int byteOffset, byte value)
-        {
-            return PackValue(packed, byteOffset, 0xff, value);
         }
         #endregion
     }

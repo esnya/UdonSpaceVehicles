@@ -21,6 +21,7 @@ namespace UdonSpaceVehicles
         public float collisionDamage = 0.01f;
         public AudioSource audioSource, audioSource2d;
         public AudioClip onHit, onDead, onCollision;
+        [UdonSynced] private bool syncDamaged;
         #endregion
 
         #region Logics
@@ -49,32 +50,22 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Udon Events
-        private SyncManager syncManager;
-        private uint syncManagerBank;
-        public override void OnPlayerJoined(VRCPlayerApi player)
+        private bool prevDamaged;
+        public override void OnDeserialization()
         {
-            if (player.isLocal)
-            {
-                syncManager = vehicleRoot.syncManager;
-                syncManagerBank = vehicleRoot.syncManagerBank;
-
-                syncManager.AddEventListener(this, syncManagerBank, 0x02u, nameof(syncValue), nameof(prevValue), nameof(_OnSyncValueChanged));
-            }
+            if (syncDamaged == prevDamaged) return;
+            SetDamaged(syncDamaged);
+            prevDamaged = syncDamaged;
         }
         #endregion
 
         #region Custom Events
-        private uint syncValue, prevValue;
-        public void _OnSyncValueChanged()
-        {
-            SetDamaged(UnpackBool(syncValue, 1));
-        }
 
         public void _Respawned()
         {
             hp = maxHP;
             SetDamaged(false);
-            syncManager.SetBool(syncManagerBank, 1, false);
+            syncDamaged = false;
         }
 
         public void _Hit()
@@ -121,9 +112,8 @@ namespace UdonSpaceVehicles
                 Log("Info", $"Damaged {damage}");
             }
 
-            var damaged = hp <= Mathf.Max(1.0f, maxHP * 0.25f);
-            SetDamaged(damaged);
-            syncManager.SetBool(syncManagerBank, 1, damaged);
+            syncDamaged = hp <= Mathf.Max(1.0f, maxHP * 0.25f);
+            SetDamaged(syncDamaged);
 
             if (hp <= 0.0f) Dead();
         }
