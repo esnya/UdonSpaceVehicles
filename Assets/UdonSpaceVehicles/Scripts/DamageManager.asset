@@ -62,7 +62,7 @@ MonoBehaviour:
       Data: 4|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: UdonSpaceVehicles.VehicleRoot, UdonSpaceVehiclesRuntime
+      Data: UdonSpaceVehicles.VehicleRoot, UdonSpaceVehicles.Runtime
     - Name: 
       Entry: 8
       Data: 
@@ -824,7 +824,7 @@ MonoBehaviour:
       Data: 48|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: UdonSpaceVehicles.UdonLogger, UdonSpaceVehiclesRuntime
+      Data: UdonSpaceVehicles.UdonLogger, UdonSpaceVehicles.Runtime
     - Name: 
       Entry: 8
       Data: 

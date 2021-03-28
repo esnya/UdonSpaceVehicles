@@ -10,7 +10,7 @@ using VRC.Udon.Common.Interfaces;
 namespace UdonSpaceVehicles
 {
     [CustomName("USV Thruster Driver")]
-    [HelpMessage("Applies thruster force to the vehicle, and animate them.")]
+    [HelpMessage("Applies thruster force to the vehicle, and animate them. Updates an animator float parameter \"Power\" on children with sync.")]
     public class ThrusterDriver : UdonSharpBehaviour
     {
         #region Public Variables
@@ -46,7 +46,6 @@ namespace UdonSpaceVehicles
             }
             SetThrustAnimation(i, thrust);
             syncValue = PackBool(syncValue, i, thrust);
-            Debug.Log(syncValue);
         }
         #endregion
 

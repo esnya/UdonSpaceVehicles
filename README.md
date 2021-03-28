@@ -7,8 +7,9 @@ This is the Udon package for realizing a space plane with VRChat. Simulates orbi
 Inspired by [SaccFlightAndVehicles](https://github.com/Sacchan-VRC/SaccFlightAndVehicles.git)
 
 ## Requirements
-* [UdonSharp](https://github.com/MerlinVR/UdonSharp/tree/v0.19.5) v0.19.5 or later
-* [UdonToolKit](https://github.com/orels1/UdonToolkit/tree/develop) v1.0.0-rc or later
+* VRCSDK3-WORLD 2021.03.22.18.27 or later
+* [UdonSharp](https://github.com/MerlinVR/UdonSharp/tree/v0.19.5) v0.19.8 or later
+* [UdonToolKit](https://github.com/orels1/UdonToolkit/tree/develop) v1.0.0-rc2 or later
   * Download from **develop branch**. Do not from rerelases because it's not released yet.
   * Recommended to setup acording to [Installation](https://github.com/orels1/UdonToolkit/tree/develop#installation)
 

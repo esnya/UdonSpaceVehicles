@@ -77,7 +77,8 @@ namespace UdonSpaceVehicles
             var maxPower = 0.0f;
             for (int i = 0; i < engineCount; i++)
             {
-                var power = Vector3.Dot(input, axises[i]);
+                var axis = transform.InverseTransformVector(engines[i].forward);;
+                var power = Vector3.Dot(input, axis);
                 maxPower = Mathf.Max(maxPower, power);
                 SetPower(i, power);
             }
@@ -153,7 +154,6 @@ namespace UdonSpaceVehicles
         {
             return PackValue(packed, byteOffset, 0x1, value ? 1u : 0u);
         }
-
         #endregion
     }
 }
