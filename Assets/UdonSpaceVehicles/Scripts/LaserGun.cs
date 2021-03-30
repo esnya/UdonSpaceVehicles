@@ -42,9 +42,11 @@ namespace UdonSpaceVehicles
         {
             if (!active) return;
 
-            if (Time.frameCount % fireInterval == 0 && GetTrigger())
+            if (ready && GetTrigger())
             {
+                ready = false;
                 SendCustomNetworkEvent(NetworkEventTarget.All, nameof(Fire));
+                SendCustomEventDelayedFrames(nameof(_Ready), fireInterval);
             }
         }
 
@@ -75,6 +77,12 @@ namespace UdonSpaceVehicles
             particleSystem.Emit(1);
             if (audioSource != null) audioSource.PlayOneShot(audioClip);
         }
+
+        private bool ready;
+        public void _Ready()
+        {
+            ready = true;
+        }
         #endregion
 
 
@@ -84,6 +92,7 @@ namespace UdonSpaceVehicles
         public void Activate()
         {
             active = true;
+            SendCustomEventDelayedFrames(nameof(_Ready), fireInterval);
             Log("Info", "Activated");
         }
 
