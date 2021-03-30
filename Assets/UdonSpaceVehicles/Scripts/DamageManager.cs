@@ -33,9 +33,10 @@ namespace UdonSpaceVehicles
         private void Dead()
         {
             SendCustomNetworkEvent(NetworkEventTarget.All, nameof(PlayDeadSound));
+            if (active) vehicleRoot.SendCustomNetworkEvent(NetworkEventTarget.All, $"LogDeadBy{lastDamageSource}");
             Log("Info", "Dead");
 
-            vehicleRoot.Respawn();
+            vehicleRoot.SendCustomEventDelayedSeconds(nameof(vehicleRoot.Respawn), 1);
         }
         #endregion
 
@@ -71,7 +72,7 @@ namespace UdonSpaceVehicles
         public void _Hit()
         {
             SendCustomNetworkEvent(NetworkEventTarget.All, nameof(PlayDamageSound));
-            AddDamage(1.0f);
+            AddDamage(1.0f, "Hit");
         }
 
         private Collision collision;
@@ -83,7 +84,7 @@ namespace UdonSpaceVehicles
 
             if (damage > 0.2f) SendCustomNetworkEvent(NetworkEventTarget.All, nameof(PlayCollisionSound));
 
-            AddDamage(damage);
+            AddDamage(damage, "Collision");
         }
 
         public void PlayDamageSound()
@@ -101,7 +102,8 @@ namespace UdonSpaceVehicles
             audioSource.PlayOneShot(onCollision);
         }
 
-        public void AddDamage(float damage)
+        private string lastDamageSource;
+        public void AddDamage(float damage, string damageSource)
         {
             if (!Networking.IsOwner(vehicleRoot.gameObject)) return;
 
@@ -109,13 +111,31 @@ namespace UdonSpaceVehicles
 
             if (damage >= 0.2f)
             {
-                Log("Info", $"Damaged {damage}");
+                lastDamageSource = damageSource;
+                Log("Info", $"Damaged from {damageSource}: {damage}");
             }
 
             syncDamaged = hp <= Mathf.Max(1.0f, maxHP * 0.25f);
             SetDamaged(syncDamaged);
 
             if (hp <= 0.0f) Dead();
+        }
+        #endregion
+
+
+        #region Activatable
+        bool active = false;
+
+        public void Activate()
+        {
+            active = true;
+            Log("Info", "Activated");
+        }
+
+        public void Deactivate()
+        {
+            active = false;
+            Log("Info", "Deactivated");
         }
         #endregion
 

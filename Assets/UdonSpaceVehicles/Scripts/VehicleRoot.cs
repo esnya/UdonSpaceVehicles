@@ -119,6 +119,15 @@ namespace UdonSpaceVehicles
             BroadcastCustomEvent("_Hit");
         }
 
+        public void LogDeadByHit()
+        {
+            Log("Notice", "Killed in the shooting");
+        }
+
+        public void LogDeadByCollision()
+        {
+            Log("Notice", "Dead in the crash");
+        }
         #endregion
 
         #region Activatable
@@ -141,8 +150,8 @@ namespace UdonSpaceVehicles
         [Space] [SectionHeader("Udon Logger")] public UdonLogger logger;
         private void Log(string level, string message)
         {
-            if (logger != null) logger.Log(level, gameObject.name, message);
-            else Debug.Log($"{level} [{gameObject.name}] {message}");
+            if (logger != null) logger.Log(level, $"{gameObject.name} ({Networking.GetOwner(gameObject).displayName})", message);
+            else Debug.Log($"{level} [{gameObject.name} ({Networking.GetOwner(gameObject).displayName})] {message}");
         }
         #endregion
     }
