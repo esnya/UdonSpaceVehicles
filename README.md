@@ -75,7 +75,7 @@ Manages collisions, and respawns, vehicle power states. Attach to the root game 
 VRChatで宇宙機を実現するためのUdonパッケージです。6軸機動、引力などの軌道上の挙動をシミュレートします。
 
 ## Requirements
-* [UdonSharp](https://github.com/MerlinVR/UdonSharp/tree/v0.19.5) v0.19.5 以降
+* [UdonSharp](https://github.com/MerlinVR/UdonSharp/tree/v0.19.5) v0.19.8 以降
 * [UdonToolKit](https://github.com/orels1/UdonToolkit/tree/develop) v1.0.0-rc 以降
   * **develop**ブランチからダウンロードしてください。 リリースはまだされていないのでGitHubにunitypackageはありません。
   * [Installation](https://github.com/orels1/UdonToolkit/tree/develop#installation)の設定をしておくことを推奨します。

@@ -13,3 +13,9 @@
 	path = Assets/VRC-Bakery-Adapter
 	url = https://github.com/MerlinVR/VRC-Bakery-Adapter.git
 	ignore = untracked
+[submodule "Assets/EsnyaUnityTools"]
+	path = Assets/EsnyaUnityTools
+	url = https://github.com/esnya/EsnyaUnityTools.git
+[submodule "Assets/EasyQuestSwitch"]
+	path = Assets/EasyQuestSwitch
+	url = https://github.com/JordoVR/EasyQuestSwitch.git
