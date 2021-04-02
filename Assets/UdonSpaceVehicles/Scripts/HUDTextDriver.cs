@@ -5,6 +5,9 @@ using UdonSharp;
 using UdonToolkit;
 using UnityEngine;
 using VRC.Udon;
+using Mono.Cecil.Rocks;
+using UnityEngine.Experimental.UIElements;
+using System.ComponentModel;
 #if !COMPILER_UDONSHARP && UNITY_EDITOR
 using System.Linq;
 using UdonSharpEditor;
@@ -21,13 +24,9 @@ namespace UdonSpaceVehicles
         #region Public Variables
         public bool findTargetFromParent = true;
         [HideIf("@findTargetFromParent")] public Rigidbody target;
-        [SectionHeader("Mode")][Popup("GetModes")] public string mode;
-        [HideIf("HideForward")] public bool signed = true;
-        [HideIf("HideForward")] public Vector3 forward = Vector3.forward;
-        [HideIf("HIdeForward")] public Vector3 axisScale = Vector3.one;
-        [HideIf("HideAxis")] public Vector3 axis = Vector3.forward;
-        [SectionHeader("Format")] public string prefix = "";
-        public string suffix = " <size=75%>{}</size>";
+        [Popup("GetModes")] public string[] enableValues = { "SPEED" };
+
+        [TextArea] public string format = "{SPEED}<size=75%>KMpH</size>";
         #endregion
 
         #region Orbital Object
@@ -38,7 +37,6 @@ namespace UdonSpaceVehicles
         [HideIf("@useGlobalSettings")] public Vector3 positionBias;
         [HideIf("@useGlobalSettings")] public Vector3 velocityBias;
         [HideIf("@useGlobalSettings")] public float G = 6.67430e-11f;
-        private float planetCoG;
 
         private void OrbitalObject_Activate()
         {
@@ -56,46 +54,77 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Logics
-        private const int Speed = 0, Velocity = 1, Altitude = 2, Gravity = 3, OrbitalSpeed = 4, SemiMajorAxis = 5, OrbitalInclination = 6, OrbitalEccentricity = 7, PericenterAltitude = 8, ApocenterAltitude = 9;
+        private readonly string[] definitions = {
+            "SPEED", "f2",
+            "X_SPEED", "f2",
+            "Y_SPEED", "f2",
+            "Z_SPEED", "f2",
+            "ALTITUDE","f0",
+            "ACCELERATION", "f2",
+            "ORBITAL_SPEED", "f2",
+            "SEMI_MAJOR_AXIS", "f0",
+            "ORBITAL_INCLINATION", "f2",
+            "ORBITAL_ECCENTRICITY", "f2",
+            "PERICENTER_ALTITUDE", "f0",
+            "APOCENTER_ALTITUDE", "f0",
+        };
+        private int definitionCount;
 
 #if !COMPILER_UDONSHARP && UNITY_EDITOR
-        private string[] GetModes() => Enumerable.Range(0, GetModeTable().Length / 3).Select(i => GetModeTable()[i * 3]).ToArray();
+        private string[] GetModes() => Enumerable.Range(0, definitions.Length / 2).Select(i => definitions[i * 2]).ToArray();
+        private string GetFormatPlaceholders()
+        {
+            return string.Join("\n", GetModes().Select(mode => $"%{mode}%"));
+        }
 #endif
 
-        private string[] GetModeTable() => new[] {
-            "Speed",                "KMpH", "f2",
-            "Axis Speed",           "KMpH", "f2",
-            "Altitude",             "m",    "f0",
-            "Gravity",              "G",    "f2",
-            "Orbital Speed",        "KMpH", "f2",
-            "Semi Major Axis",      "m",    "f0",
-            "Orbital Inclination",  "°",   "f2",
-            "Orbital Eccentricity", "",     "f2",
-            "Pericenter Altitude",  "m",    "f0",
-            "Apocenter Altitude",   "m",    "f0",
-        };
-        private string format = "f";
+        private bool[] useFlags;
+        private float[] values;
+
         private TextMeshPro text;
         private void Initialize()
         {
             text = GetComponent<TextMeshPro>();
 
-            var table = GetModeTable();
-            for (int i = 0; i < table.Length / 3; i++) {
-                if (mode == table[i * 3]) {
-                    _mode = i;
-                    break;
+            definitionCount = definitions.Length / 2;
+            values = new float[definitionCount];
+            useFlags = new bool[definitionCount];
+            for (int i = 0; i < definitionCount; i++) useFlags[i] = false;
+            foreach (var name in enableValues)
+            {
+                for (int j = 0; j < definitionCount; j++) {
+                    if (definitions[j * 2] == name)
+                    {
+                        useFlags[j] = true;
+                        break;
+                    }
                 }
             }
-            _suffix = suffix.Replace("{}", table[_mode * 3 + 1]);
-            format = table[_mode * 3 + 2];
-            value = -999.99f;
+
             UpdateText();
         }
 
         private void UpdateText()
         {
-            text.text = $"{prefix}{value.ToString(format)}{_suffix}";
+            var tmp = format;
+
+            for (int i = 0; i < definitionCount; i++)
+            {
+                if (!useFlags[i]) continue;
+                Debug.Log($"%{definitions[i * 2]}%");
+                tmp = tmp.Replace($"%{definitions[i * 2]}%", values[i].ToString(definitions[i * 2 + 1]));
+            }
+
+            text.text = tmp;
+        }
+
+        private Vector3 prevVelocity;
+        private float CalcAcceleration()
+        {
+            var a = target.velocity - prevVelocity;
+            var value = a.magnitude * Mathf.Sign(a.y) / Time.fixedDeltaTime / 9.8f;
+            prevVelocity = target.velocity;
+            return value;
         }
 
         private float CalcStandardGravitionalParameter() => G * planetMass; // μ
@@ -108,12 +137,15 @@ namespace UdonSpaceVehicles
         private float CalcOrbitalEccentricity() => Mathf.Sqrt(1 + 2 * CalcSpecificOrbitalEnergy() * CalcSpecificAngularMomentum().sqrMagnitude / Mathf.Pow(CalcStandardGravitionalParameter(), 2)); // e
         private float CalcPericenterAltitude() => (1 - CalcOrbitalEccentricity()) * CalcSemiMajorAxis() - positionBias.y + altitudeBias; // r_per
         private float CalcApocenterAltitude() => (1 + CalcOrbitalEccentricity()) * CalcSemiMajorAxis() - positionBias.y + altitudeBias; // r_ap
+        private float CalcOrbitalInclination()
+        {
+            var v = target.velocity + velocityBias;
+            return Mathf.Atan2(v.x, v.z) * Mathf.Rad2Deg;
+        }
         #endregion
 
         #region Unity Events
-        private int _mode;
         private Transform targetTransform;
-        private string _suffix;
         private void Start()
         {
             if (findTargetFromParent) target = GetComponentInParent<Rigidbody>();
@@ -123,32 +155,22 @@ namespace UdonSpaceVehicles
             Log("Info", "Initialized");
         }
 
-        private float value;
-        private Vector3 prevVelocity;
         private void FixedUpdate()
         {
             if (!active) return;
 
-            switch (_mode)
-            {
-                case Speed:                 value = target.velocity.magnitude * (signed ? Mathf.Sign(Vector3.Dot(targetTransform.forward, target.velocity)) : 1.0f) * 3.6f; break;
-                case Velocity:              value = Vector3.Dot(targetTransform.TransformDirection(axis), target.velocity) * 3.6f; break;
-                case Altitude:              value = targetTransform.position.y + altitudeBias; break;
-                case Gravity:
-                    var a = target.velocity - prevVelocity;
-                    value = a.magnitude * Mathf.Sign(a.y) / Time.fixedDeltaTime / 9.8f;
-                    prevVelocity = target.velocity;
-                    break;
-                case OrbitalSpeed:          value = CalcVelocity().magnitude; break;
-                case SemiMajorAxis:         value = CalcSemiMajorAxis(); break;
-                case OrbitalInclination:
-                    var v = target.velocity + velocityBias;
-                    value = Mathf.Atan2(v.x, v.z) * Mathf.Rad2Deg;
-                    break;
-                case OrbitalEccentricity:   value = CalcOrbitalEccentricity(); break;
-                case PericenterAltitude:    value = CalcPericenterAltitude(); break;
-                case ApocenterAltitude:     value = CalcApocenterAltitude(); break;
-            }
+            if (useFlags[0]) values[0] = target.velocity.magnitude * Mathf.Sign(Vector3.Dot(targetTransform.forward, target.velocity)) * 3.6f;
+            if (useFlags[1]) values[1] = Vector3.Dot(targetTransform.right, target.velocity) * 3.6f;
+            if (useFlags[2]) values[2] = Vector3.Dot(targetTransform.up, target.velocity) * 3.6f;
+            if (useFlags[3]) values[3] = Vector3.Dot(targetTransform.forward, target.velocity) * 3.6f;
+            if (useFlags[4]) values[4] = targetTransform.position.y + altitudeBias;
+            if (useFlags[5]) values[5] = CalcAcceleration();
+            if (useFlags[6]) values[6] = CalcVelocity().magnitude;
+            if (useFlags[7]) values[7] = CalcSemiMajorAxis();
+            if (useFlags[8]) values[8] = CalcOrbitalInclination();
+            if (useFlags[9]) values[9] = CalcOrbitalEccentricity();
+            if (useFlags[10]) values[10] = CalcPericenterAltitude();
+            if (useFlags[11]) values[11] = CalcApocenterAltitude();
         }
 
         private void Update()
@@ -186,11 +208,5 @@ namespace UdonSpaceVehicles
             else Debug.Log($"{level} [{gameObject.name}] {message}");
         }
         #endregion
-
-#if !COMPILER_UDONSHARP && UNITY_EDITOR
-        private bool HideForward() => mode != "Speed";
-        private bool HideAxis() => mode != "Axis Speed";
-        private bool HidePositionOffset() => mode != "Altitude";
-#endif
     }
 }
