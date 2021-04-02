@@ -41,7 +41,7 @@ namespace UdonSpaceVehicles
         {
             if (thrust) {
                 var thruster = thrusters[i];
-                var worldForce = -thruster.forward * thrustPower;
+                var worldForce = thruster.forward * thrustPower;
                 target.AddForceAtPosition(worldForce, thruster.position, ForceMode.Force);
             }
             SetThrustAnimation(i, thrust);
@@ -53,7 +53,7 @@ namespace UdonSpaceVehicles
         private void Start()
         {
             if (findTargetFromParent) target = GetComponentInParent<Rigidbody>();
-            var center = transform.position;
+            var center = target.centerOfMass;
 
             thrusterCount = thrusters.Length;
             thrusterAnimators = new Animator[thrusterCount];
@@ -157,5 +157,25 @@ namespace UdonSpaceVehicles
             else Debug.Log($"{level} [{gameObject.name}] {message}");
         }
         #endregion
+
+#if !COMPILER_UDONSHARP && UNITY_EDITOR
+        private void OnDrawGizmos() {
+            if (thrusters == null) return;
+
+            if (findTargetFromParent) target = GetComponentInParent<Rigidbody>();
+
+            foreach (var thruster in thrusters)
+            {
+                if (thruster == null) continue;
+                Gizmos.color = Color.blue;
+                Gizmos.DrawWireSphere(thruster.position, 0.01f);
+                Gizmos.DrawRay(thruster.position, -thruster.forward);
+
+                if (target == null) return;
+                Gizmos.color = Color.white * 0.75f;
+                Gizmos.DrawLine(thruster.position, target.worldCenterOfMass);
+            }
+        }
+#endif
     }
 }
