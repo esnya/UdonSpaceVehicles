@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.ComponentModel.Design;
 using UdonSharp;
 using UdonToolkit;
 using UnityEngine;
@@ -39,40 +40,43 @@ namespace UdonSpaceVehicles
         #region Unity Events
         private int engineCount;
         private Vector3[] engineVectorX, engineVectorY;
-        private Vector2[] engineAngles;
+        private Vector2[] engineAngles, targetAngles;
         private Quaternion[] engineInitialRotations;
         private void Start()
         {
+            var rigidbody = GetComponentInParent<Rigidbody>();
+            var center = rigidbody.worldCenterOfMass;
+
             engineCount = Mathf.Min(engines.Length, maxAngles.Length);
             engineVectorX = new Vector3[engineCount];
             engineVectorY = new Vector3[engineCount];
             engineAngles = new Vector2[engineCount];
+            targetAngles = new Vector2[engineCount];
             engineInitialRotations = new Quaternion[engineCount];
             for (int i = 0; i < engineCount; i++)
             {
-                var position = transform.InverseTransformPoint(engines[i].position);
-                var sign = Mathf.Sign(Vector3.Dot(transform.forward, engines[i].forward));
+                var position = engines[i].position - center;
+                var sign = Mathf.Sign(Vector3.Dot(rigidbody.transform.forward, engines[i].forward));
                 engineVectorX[i] = new Vector3(
-                    Mathf.Sign(Vector3.Dot(position, Vector3.forward)),
+                    Mathf.Sign(Vector3.Dot(position, rigidbody.transform.forward)),
                     0,
-                    Mathf.Sign(Vector3.Dot(position, Vector3.left))
+                    -Mathf.Sign(Vector3.Dot(position, rigidbody.transform.right))
                 ) * sign;
                 engineVectorY[i] = new Vector3(
                     0,
-                    Mathf.Sign(Vector3.Dot(position, Vector3.forward)),
+                    Mathf.Sign(Vector3.Dot(position, rigidbody.transform.forward)),
                     0
                 ) * sign;
                 engineAngles[i] = Vector2.zero;
                 engineInitialRotations[i] = engines[i].localRotation;
+                Debug.Log($"{i} {engineVectorX[i]} {engineVectorY[i]}");
             }
 
             Log("Info", $"Initialized with {engineCount} engines");
         }
 
-        private void Update()
+        private void UpdateActive()
         {
-            if (!active) return;
-
             var input = joystickInput.input;
             for (int i = 0; i < engineCount; i++)
             {
@@ -80,14 +84,31 @@ namespace UdonSpaceVehicles
                     Vector3.Dot(input, engineVectorX[i]),
                     Vector3.Dot(input, engineVectorY[i])
                 ), maxAngles[i]);
-                var currentAngle = engineAngles[i];
-                currentAngle += Vector2.ClampMagnitude(targetAngle - currentAngle, speed);
-                SetAngle(i, currentAngle);
+                targetAngles[i] = targetAngle;
 
-                syncValue = PackBool(syncValue, i * 4 , currentAngle.x != 0);
-                syncValue = PackBool(syncValue, i * 4 + 1, currentAngle.x < 0);
-                syncValue = PackBool(syncValue, i * 4 + 2, currentAngle.y != 0);
-                syncValue = PackBool(syncValue, i * 4 + 3, currentAngle.y < 0);
+                syncValue = PackBool(syncValue, i * 4 , targetAngle.x != 0);
+                syncValue = PackBool(syncValue, i * 4 + 1, targetAngle.x < 0);
+                syncValue = PackBool(syncValue, i * 4 + 2, targetAngle.y != 0);
+                syncValue = PackBool(syncValue, i * 4 + 3, targetAngle.y < 0);
+            }
+        }
+
+        bool dirty;
+        private void Update()
+        {
+            if (active) UpdateActive();
+
+            if (active || dirty) {
+                dirty = false;
+                for (int i = 0; i < engineCount; i++)
+                {
+                    var currentAngle = engineAngles[i];
+                    var targetAngle = targetAngles[i];
+                    currentAngle += Vector2.ClampMagnitude(targetAngle - currentAngle, speed);
+                    if ((currentAngle - targetAngle).sqrMagnitude > 0.01f) dirty = true;
+
+                    SetAngle(i, currentAngle);
+                }
             }
         }
         #endregion
@@ -98,6 +119,7 @@ namespace UdonSpaceVehicles
         {
             if (prevValue == syncValue) return;
 
+            dirty = true;
             for (int i = 0; i < engineCount; i++)
             {
                 var x = UnpackBool(syncValue, i * 4);

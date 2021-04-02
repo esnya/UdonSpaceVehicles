@@ -30,7 +30,7 @@ namespace UdonSpaceVehicles
 
         private Vector3 CalculateAccelaration(Rigidbody target)
         {
-            var diff = (transform.position/* + centerOffset*/ - target.position) * lengthScale;
+            var diff = (transform.position/* + centerOffset*/ - target.worldCenterOfMass) * lengthScale;
             var sqrR = diff.sqrMagnitude;
             var a = (float)(gm / sqrR) * diff.normalized;
             return a * (Mathf.Pow(timeScale, 2.0f) / lengthScale);

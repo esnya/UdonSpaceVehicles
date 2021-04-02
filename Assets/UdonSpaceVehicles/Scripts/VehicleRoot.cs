@@ -8,7 +8,7 @@ using VRC.Udon;
 namespace UdonSpaceVehicles
 {
     [CustomName("USV Vehicle Root")]
-    [HelpMessage("Manages collisions, and respawns, vehicle syncPower states. Attach to the root game object with a Rigidbody.")]
+    [HelpMessage("Manages collisions, and respawns, vehicle syncPower states. Attach to the root game object with a Rigidbody. !! KEEP ONLY ONE RIGIDBODY ON ONE VEHICLE !!")]
     [RequireComponent(typeof(Rigidbody))]
     public class VehicleRoot : UdonSharpBehaviour
     {

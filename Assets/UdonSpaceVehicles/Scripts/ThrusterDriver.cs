@@ -53,7 +53,7 @@ namespace UdonSpaceVehicles
         private void Start()
         {
             if (findTargetFromParent) target = GetComponentInParent<Rigidbody>();
-            var center = target.centerOfMass;
+            var center = target.worldCenterOfMass;
 
             thrusterCount = thrusters.Length;
             thrusterAnimators = new Animator[thrusterCount];
@@ -65,8 +65,8 @@ namespace UdonSpaceVehicles
 
                 var centerToThruster = (thruster.position - center).normalized;
                 var thrusterForward = thruster.TransformDirection(Vector3.forward);
-                thrusterRotationAxises[i] = transform.InverseTransformDirection(Vector3.Cross(thrusterForward, centerToThruster).normalized);
-                thrusterTranslationAxises[i] = -transform.InverseTransformDirection(thrusterForward.normalized);
+                thrusterRotationAxises[i] = -transform.InverseTransformDirection(Vector3.Cross(thrusterForward, centerToThruster).normalized);
+                thrusterTranslationAxises[i] = transform.InverseTransformDirection(thrusterForward.normalized);
 
                 thrusterAnimators[i] = thruster.GetComponentInChildren<Animator>();
             }

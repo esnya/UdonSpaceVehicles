@@ -49,7 +49,7 @@ namespace UdonSpaceVehicles {
         Vector3 CalculateAccelaration()
         {
             var v = target.velocity + velocityBias;
-            var r = target.position + positionBias;
+            var r = target.worldCenterOfMass + positionBias;
             var sqrRadius = r.sqrMagnitude;
             var w = 1 / sqrRadius * Vector3.Cross(r, v);
             var ar = -Vector3.Cross(w, Vector3.Cross(w, r));
