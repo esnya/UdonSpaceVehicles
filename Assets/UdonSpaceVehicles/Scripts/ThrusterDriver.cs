@@ -2,10 +2,10 @@
 using UdonSharp;
 using UdonToolkit;
 using UnityEngine;
-using UnityEngine.UI;
-using VRC.SDKBase;
-using VRC.Udon;
-using VRC.Udon.Common.Interfaces;
+#if !COMPILER_UDONSHARP && UNITY_EDITOR
+using System.Linq;
+using System.Collections.Generic;
+#endif
 
 namespace UdonSpaceVehicles
 {
@@ -159,19 +159,26 @@ namespace UdonSpaceVehicles
         #endregion
 
 #if !COMPILER_UDONSHARP && UNITY_EDITOR
+        private IEnumerable<Transform> GetTargets()
+        {
+
+            return thrusters == null
+                ? Enumerable.Empty<Transform>()
+                : thrusters.Where(t => t != null);
+        }
         private void OnDrawGizmos() {
-            if (thrusters == null) return;
-
-            if (findTargetFromParent) target = GetComponentInParent<Rigidbody>();
-
-            foreach (var thruster in thrusters)
+            foreach (var thruster in GetTargets())
             {
-                if (thruster == null) continue;
                 Gizmos.color = Color.blue;
-                Gizmos.DrawWireSphere(thruster.position, 0.01f);
                 Gizmos.DrawRay(thruster.position, -thruster.forward);
+            }
+        }
 
-                if (target == null) return;
+        private void OnDrawGizmosSelected() {
+            if (findTargetFromParent) target = GetComponentInParent<Rigidbody>();
+            if (target == null) return;
+            foreach (var thruster in GetTargets())
+            {
                 Gizmos.color = Color.white * 0.75f;
                 Gizmos.DrawLine(thruster.position, target.worldCenterOfMass);
             }

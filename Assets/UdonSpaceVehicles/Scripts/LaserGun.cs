@@ -116,5 +116,13 @@ namespace UdonSpaceVehicles
             else Debug.Log($"{level} [{gameObject.name}] {message}");
         }
         #endregion
+
+#if !COMPILER_UDONSHARP && UNITY_EDITOR
+        private void OnDrawGizmos() {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, 0.01f);
+            Gizmos.DrawRay(transform.position, transform.forward);
+        }
+#endif
     }
 }

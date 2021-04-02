@@ -2,7 +2,10 @@
 using UdonSharp;
 using UdonToolkit;
 using UnityEngine;
-using VRC.SDKBase;
+#if !COMPILER_UDONSHARP && UNITY_EDITOR
+using System.Linq;
+using System.Collections.Generic;
+#endif
 
 namespace UdonSpaceVehicles
 {
@@ -155,5 +158,32 @@ namespace UdonSpaceVehicles
             return PackValue(packed, byteOffset, 0x1, value ? 1u : 0u);
         }
         #endregion
+
+#if !COMPILER_UDONSHARP && UNITY_EDITOR
+        private IEnumerable<Transform> GetTargets()
+        {
+
+            return engines == null
+                ? Enumerable.Empty<Transform>()
+                : engines.Where(t => t != null);
+        }
+        private void OnDrawGizmos() {
+            foreach (var t in GetTargets())
+            {
+                Gizmos.color = Color.blue;
+                Gizmos.DrawRay(t.position, -t.forward);
+            }
+        }
+
+        private void OnDrawGizmosSelected() {
+            if (findTargetFromParent) target = GetComponentInParent<Rigidbody>();
+            if (target == null) return;
+            foreach (var t in GetTargets())
+            {
+                Gizmos.color = Color.white * 0.75f;
+                Gizmos.DrawLine(t.position, target.worldCenterOfMass);
+            }
+        }
+#endif
     }
 }

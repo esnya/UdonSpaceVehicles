@@ -19,3 +19,4 @@
 [submodule "Assets/EasyQuestSwitch"]
 	path = Assets/EasyQuestSwitch
 	url = https://github.com/JordoVR/EasyQuestSwitch.git
+	ignore = untracked

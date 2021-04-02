@@ -154,5 +154,17 @@ namespace UdonSpaceVehicles
             else Debug.Log($"{level} [{gameObject.name} ({Networking.GetOwner(gameObject).displayName})] {message}");
         }
         #endregion
+
+#if !COMPILER_UDONSHARP && UNITY_EDITOR
+        private void OnDrawGizmos() {
+            var rigidbody = GetComponent<Rigidbody>();
+            if (rigidbody == null) return;
+
+            Gizmos.color = Color.white;
+            Gizmos.color = Color.red; Gizmos.DrawRay(rigidbody.worldCenterOfMass, transform.right);
+            Gizmos.color = Color.green; Gizmos.DrawRay(rigidbody.worldCenterOfMass, transform.up);
+            Gizmos.color = Color.blue; Gizmos.DrawRay(rigidbody.worldCenterOfMass, transform.forward);
+        }
+#endif
     }
 }
