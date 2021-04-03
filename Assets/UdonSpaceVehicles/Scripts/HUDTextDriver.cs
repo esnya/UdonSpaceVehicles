@@ -1,16 +1,10 @@
-﻿
-using System;
-using TMPro;
+﻿using TMPro;
 using UdonSharp;
 using UdonToolkit;
 using UnityEngine;
 using VRC.Udon;
-using Mono.Cecil.Rocks;
-using UnityEngine.Experimental.UIElements;
-using System.ComponentModel;
 #if !COMPILER_UDONSHARP && UNITY_EDITOR
 using System.Linq;
-using UdonSharpEditor;
 #endif
 
 namespace UdonSpaceVehicles
