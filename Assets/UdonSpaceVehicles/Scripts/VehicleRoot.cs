@@ -4,6 +4,9 @@ using UdonToolkit;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
+#if !COMPILER_UDONSHARP && UNITY_EDITOR
+using UdonSharpEditor;
+#endif
 
 namespace UdonSpaceVehicles
 {
@@ -18,6 +21,9 @@ namespace UdonSpaceVehicles
         [ListView("On Collision Event Targets")] public UdonSharpBehaviour[] onCollisionTargets = {};
         [ListView("On Collision Event Targets")] public string[] onCollisionVariableNames = {};
         [ListView("On Collision Event Targets")][Popup("behaviour", "@onCollisionTargets", true)] public string[] onCollisionEventNames = {};
+
+        public bool overrideCenterOfMass;
+        [HideIf("@!overrideCenterOfMass")] public Vector3 centerOfMass;
         #endregion
         private const int Power = 0;
 
@@ -62,6 +68,11 @@ namespace UdonSpaceVehicles
             rootRigidbody = GetComponent<Rigidbody>();
             initialPosition = transform.localPosition;
             initialRotation = transform.localRotation;
+
+            if (overrideCenterOfMass)
+            {
+                rootRigidbody.centerOfMass = centerOfMass;
+            }
 
             udonBehaviours = GetComponentsInChildren(typeof(UdonBehaviour));
 
@@ -159,11 +170,21 @@ namespace UdonSpaceVehicles
         private void OnDrawGizmos() {
             var rigidbody = GetComponent<Rigidbody>();
             if (rigidbody == null) return;
+            if (overrideCenterOfMass)
+            {
+                this.UpdateProxy();
+                rigidbody.centerOfMass = centerOfMass;
+            }
 
             Gizmos.color = Color.white;
             Gizmos.color = Color.red; Gizmos.DrawRay(rigidbody.worldCenterOfMass, transform.right);
             Gizmos.color = Color.green; Gizmos.DrawRay(rigidbody.worldCenterOfMass, transform.up);
             Gizmos.color = Color.blue; Gizmos.DrawRay(rigidbody.worldCenterOfMass, transform.forward);
+        }
+
+        [Button("Reset Center Of Mass", true)] private void ResetCenterOfMass()
+        {
+            GetComponent<Rigidbody>().ResetCenterOfMass();
         }
 #endif
     }
