@@ -127,10 +127,10 @@ namespace UdonSpaceVehicles
                 var y = UnpackBool(syncValue, i * 4 + 2);
                 var ySign = UnpackBool(syncValue, i * 4 + 3);
 
-                SetAngle(i, Vector2.Scale(new Vector2(
+                targetAngles[i] = Vector2.Scale(new Vector2(
                     DecodeValue(x, xSign),
                     DecodeValue(y, ySign)
-                ), maxAngles[i]));
+                ), maxAngles[i]);
             }
 
             prevValue = syncValue;
