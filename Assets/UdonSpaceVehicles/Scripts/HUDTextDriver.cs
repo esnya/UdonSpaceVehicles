@@ -105,7 +105,6 @@ namespace UdonSpaceVehicles
             for (int i = 0; i < definitionCount; i++)
             {
                 if (!useFlags[i]) continue;
-                Debug.Log($"%{definitions[i * 2]}%");
                 tmp = tmp.Replace($"%{definitions[i * 2]}%", values[i].ToString(definitions[i * 2 + 1]));
             }
 
