@@ -21,6 +21,7 @@ namespace UdonSpaceVehicles
 
         [SectionHeader("VR Input")] public VRCPlayerApi.TrackingDataType targetHand = VRCPlayerApi.TrackingDataType.RightHand;
         string gripAxis;
+        [Range(0, 1)] public float deadZone = 0.05f;
         public float gripThreshold = 0.75f;
         [HelpBox("Maximum angle in degrees when joystick mode. Maximam distance in meters when slider mode.")] public Vector3 maxValue = Vector3.one * 30.0f;
         Vector3 inverseMaxValue;
@@ -32,13 +33,14 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Logics
-        float Clamp11(float value)
+        float RemapInput(float value)
         {
-            return Mathf.Clamp(value, -1.0f, 1.0f);
+            var clamped = Mathf.Clamp(value, -1.0f, 1.0f);
+            return Mathf.Abs(clamped) < deadZone ? 0 : (clamped - Mathf.Sign(clamped) * deadZone) / (1 - deadZone);
         }
         float RemapRadianInput(float radian, float max)
         {
-            return Clamp11(radian * Mathf.Rad2Deg / max);
+            return RemapInput(radian * Mathf.Rad2Deg / max);
         }
 
         Quaternion rotationOffset;
@@ -73,9 +75,9 @@ namespace UdonSpaceVehicles
             {
                 var rawInput = Vector3.Scale(controllerPosition - positionOffset, inverseMaxValue);
 
-                input.x = Clamp11(rawInput.x);
-                input.y = Clamp11(rawInput.y);
-                input.z = Clamp11(rawInput.z);
+                input.x = RemapInput(rawInput.x);
+                input.y = RemapInput(rawInput.y);
+                input.z = RemapInput(rawInput.z);
             }
         }
 
