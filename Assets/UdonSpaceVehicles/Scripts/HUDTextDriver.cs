@@ -66,8 +66,8 @@ namespace UdonSpaceVehicles
             "ACCELERATION", "f2",
             "ORBITAL_SPEED", "f2",
             "SEMI_MAJOR_AXIS", "f0",
-            "ORBITAL_INCLINATION", "f4",
-            "ORBITAL_ECCENTRICITY", "f2",
+            "ORBITAL_INCLINATION", "f3",
+            "ORBITAL_ECCENTRICITY", "f4",
             "PERICENTER_ALTITUDE", "f0",
             "APOCENTER_ALTITUDE", "f0",
         };
