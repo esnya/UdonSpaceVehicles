@@ -5,6 +5,7 @@ using UnityEngine;
 using VRC.Udon;
 #if !COMPILER_UDONSHARP && UNITY_EDITOR
 using System.Linq;
+using UdonSharpEditor;
 #endif
 
 namespace UdonSpaceVehicles
@@ -18,32 +19,40 @@ namespace UdonSpaceVehicles
         #region Public Variables
         public bool findTargetFromParent = true;
         [HideIf("@findTargetFromParent")] public Rigidbody target;
+        [HelpBox("Set None to use the profile attached to \"_USV_Global_Profile_\"")] public GravityProfile gravityProfile;
         [Popup("GetModes")] public string[] enableValues = { "SPEED" };
 
         [TextArea] public string format = "{SPEED}<size=75%>KMpH</size>";
         #endregion
 
-        #region Orbital Object
-        [SectionHeader("Orbital Settings")]
-        public bool useGlobalSettings = true;
-        [HideIf("@useGlobalSettings")] public float planetMass;
-        [HideIf("@useGlobalSettings")] public float altitudeBias = 350e+3f;
-        [HideIf("@useGlobalSettings")] public Vector3 positionBias;
-        [HideIf("@useGlobalSettings")] public Vector3 velocityBias;
-        [HideIf("@useGlobalSettings")] public float G = 6.67430e-11f;
-
-        private void OrbitalObject_Activate()
+        #region Gravitational Object
+        float standardGravitationalParameter, altitudeBias;
+        Vector3 positionBias, velocityBias;
+        private void LoadGravityProfile(GravityProfile profile)
         {
-            if (useGlobalSettings)
+            if (profile == null)
             {
-                var globalSettings = (UdonBehaviour)GameObject.Find("_USV_Global_Settings_").GetComponent(typeof(UdonBehaviour));
-                if (globalSettings == null) return;
-                planetMass = (float)globalSettings.GetProgramVariable(nameof(GlobalSettings.planetMass));
-                altitudeBias = (float)globalSettings.GetProgramVariable(nameof(GlobalSettings.altitudeBias));
-                positionBias = (Vector3)globalSettings.GetProgramVariable(nameof(GlobalSettings.positionBias));
-                velocityBias = (Vector3)globalSettings.GetProgramVariable(nameof(GlobalSettings.velocityBias));
-                G = (float)globalSettings.GetProgramVariable(nameof(GlobalSettings.G));
+                var globalProfileObject = GameObject.Find("_USV_Global_Profile_");
+                if (globalProfileObject == null)
+                {
+                    Log("Error", "Failed to find global GravityProfile");
+                    return;
+                }
+                profile = globalProfileObject.GetComponent<GravityProfile>();
             }
+            if (profile == null)
+            {
+                Log("Error", "Failed to load GravityProfile");
+                return;
+            }
+
+#if !COMPILER_UDONSHARP && UNITY_EDITOR
+            profile.GetUdonSharpComponent<GravityProfile>().UpdateProxy();
+#endif
+            standardGravitationalParameter = profile.GetStandardGravitationalParameter();
+            positionBias = profile.GetPositionBias();
+            velocityBias = profile.velocityBias;
+            altitudeBias = profile.altitudeBias;
         }
         #endregion
 
@@ -57,7 +66,7 @@ namespace UdonSpaceVehicles
             "ACCELERATION", "f2",
             "ORBITAL_SPEED", "f2",
             "SEMI_MAJOR_AXIS", "f0",
-            "ORBITAL_INCLINATION", "f2",
+            "ORBITAL_INCLINATION", "f4",
             "ORBITAL_ECCENTRICITY", "f2",
             "PERICENTER_ALTITUDE", "f0",
             "APOCENTER_ALTITUDE", "f0",
@@ -74,10 +83,12 @@ namespace UdonSpaceVehicles
 
         private bool[] useFlags;
         private float[] values;
-
         private TextMeshPro text;
         private void Initialize()
         {
+            if (findTargetFromParent) target = GetComponentInParent<Rigidbody>();
+            targetTransform = target.transform;
+
             text = GetComponent<TextMeshPro>();
 
             definitionCount = definitions.Length / 2;
@@ -112,7 +123,7 @@ namespace UdonSpaceVehicles
         }
 
         private Vector3 prevVelocity;
-        private float CalcAcceleration()
+        private float CalcAccelerationG()
         {
             var a = target.velocity - prevVelocity;
             var value = a.magnitude * Mathf.Sign(a.y) / Time.fixedDeltaTime / 9.8f;
@@ -120,7 +131,7 @@ namespace UdonSpaceVehicles
             return value;
         }
 
-        private float CalcStandardGravitionalParameter() => G * planetMass; // μ
+        private float CalcStandardGravitionalParameter() => standardGravitationalParameter; // μ
         private Vector3 CalcVelocity() => target.velocity + velocityBias; // v
         private Vector3 CalcPosition() => target.position + positionBias;
         private Vector3 CalcDistanceVector() => Vector3.up * CalcPosition().y; // r
@@ -141,8 +152,6 @@ namespace UdonSpaceVehicles
         private Transform targetTransform;
         private void Start()
         {
-            if (findTargetFromParent) target = GetComponentInParent<Rigidbody>();
-            targetTransform = target.transform;
             Initialize();
 
             Log("Info", "Initialized");
@@ -157,8 +166,8 @@ namespace UdonSpaceVehicles
             if (useFlags[2]) values[2] = Vector3.Dot(targetTransform.up, target.velocity) * 3.6f;
             if (useFlags[3]) values[3] = Vector3.Dot(targetTransform.forward, target.velocity) * 3.6f;
             if (useFlags[4]) values[4] = targetTransform.position.y + altitudeBias;
-            if (useFlags[5]) values[5] = CalcAcceleration();
-            if (useFlags[6]) values[6] = CalcVelocity().magnitude;
+            if (useFlags[5]) values[5] = CalcAccelerationG();
+            if (useFlags[6]) values[6] = CalcVelocity().magnitude * 3.6f;
             if (useFlags[7]) values[7] = CalcSemiMajorAxis();
             if (useFlags[8]) values[8] = CalcOrbitalInclination();
             if (useFlags[9]) values[9] = CalcOrbitalEccentricity();
@@ -177,7 +186,7 @@ namespace UdonSpaceVehicles
         public void Activate()
         {
             active = true;
-            OrbitalObject_Activate();
+            LoadGravityProfile(gravityProfile);
             Log("Info", "Activated");
         }
 
@@ -195,11 +204,21 @@ namespace UdonSpaceVehicles
 
         private void Log(string level, string message)
         {
-            if (logger == null && useGlobalLogger) logger = (UdonLogger)GameObject.Find("_USV_Global_Logger_").GetComponent(typeof(UdonBehaviour));
+            if (logger == null && useGlobalLogger) logger = GameObject.Find("_USV_Global_Logger_").GetComponent<UdonLogger>();
 
             if (logger != null) logger.Log(level, gameObject.name, message);
             else Debug.Log($"{level} [{gameObject.name}] {message}");
         }
         #endregion
+
+#if !COMPILER_UDONSHARP && UNITY_EDITOR
+        private void OnDrawGizmosSelected() {
+            this.UpdateProxy();
+            if (text == null || target == null) Initialize();
+            LoadGravityProfile(gravityProfile);
+            FixedUpdate();
+            UpdateText();
+        }
+#endif
     }
 }

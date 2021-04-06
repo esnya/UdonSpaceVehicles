@@ -19,7 +19,7 @@ namespace UdonSpaceVehicles
         public KeyCode desktopKey = KeyCode.Space;
         public AudioSource audioSource;
         public AudioClip audioClip;
-        [Tooltip("Interval in frames")] public int fireInterval = 90 / 2;
+        [Tooltip("Interval in seconds")] public float fireInterval = 0.5f;
         #endregion
 
         #region Logics
@@ -46,7 +46,7 @@ namespace UdonSpaceVehicles
             {
                 ready = false;
                 SendCustomNetworkEvent(NetworkEventTarget.All, nameof(Fire));
-                SendCustomEventDelayedFrames(nameof(_Ready), fireInterval);
+                SendCustomEventDelayedSeconds(nameof(_Ready), fireInterval);
             }
         }
 
@@ -92,7 +92,7 @@ namespace UdonSpaceVehicles
         public void Activate()
         {
             active = true;
-            SendCustomEventDelayedFrames(nameof(_Ready), fireInterval);
+            SendCustomEventDelayedSeconds(nameof(_Ready), fireInterval);
             Log("Info", "Activated");
         }
 

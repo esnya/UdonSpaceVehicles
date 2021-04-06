@@ -4,6 +4,7 @@ using UdonToolkit;
 using UnityEngine;
 using VRC.Udon;
 #if !COMPILER_UDONSHARP && UNITY_EDITOR
+using UdonSharpEditor;
 #endif
 
 namespace UdonSpaceVehicles {
@@ -13,28 +14,32 @@ namespace UdonSpaceVehicles {
     {
         public bool findTargetFromParent = true;
         [HideIf("@findTargetFromParent")] public Rigidbody target;
+        [HelpBox("Set None to use the profile attached to \"_USV_Global_Profile_\"")] public GravityProfile gravityProfile;
 
-        #region Orbital Object
-        [SectionHeader("Orbital Settings")]
-        public bool useGlobalSettings = true;
-        [HideIf("@useGlobalSettings")] public float planetMass;
-        [HideIf("@useGlobalSettings")] public float altitudeBias = 350e+3f;
-        [HideIf("@useGlobalSettings")] public Vector3 positionBias;
-        [HideIf("@useGlobalSettings")] public Vector3 velocityBias;
-        [HideIf("@useGlobalSettings")] public float G = 6.67430e-11f;
-
-        private void OrbitalObject_Activate()
+        #region Gravitational Object
+        Vector3 velocityBias;
+        private void LoadGravityProfile(GravityProfile profile)
         {
-            if (useGlobalSettings)
+            if (profile == null)
             {
-                var globalSettings = (UdonBehaviour)GameObject.Find("_USV_Global_Settings_").GetComponent(typeof(UdonBehaviour));
-                if (globalSettings == null) return;
-                planetMass = (float)globalSettings.GetProgramVariable(nameof(GlobalSettings.planetMass));
-                altitudeBias = (float)globalSettings.GetProgramVariable(nameof(GlobalSettings.altitudeBias));
-                positionBias = (Vector3)globalSettings.GetProgramVariable(nameof(GlobalSettings.positionBias));
-                velocityBias = (Vector3)globalSettings.GetProgramVariable(nameof(GlobalSettings.velocityBias));
-                G = (float)globalSettings.GetProgramVariable(nameof(GlobalSettings.G));
+                var globalProfileObject = GameObject.Find("_USV_Global_Profile_");
+                if (globalProfileObject == null)
+                {
+                    Log("Error", "Failed to find global GravityProfile");
+                    return;
+                }
+                profile = globalProfileObject.GetComponent<GravityProfile>();
             }
+            if (profile == null)
+            {
+                Log("Error", "Failed to load GravityProfile");
+                return;
+            }
+
+#if !COMPILER_UDONSHARP && UNITY_EDITOR
+            profile.GetUdonSharpComponent<GravityProfile>().UpdateProxy();
+#endif
+            velocityBias = profile.velocityBias;
         }
         #endregion
 
@@ -57,7 +62,7 @@ namespace UdonSpaceVehicles {
         public void Activate()
         {
             active = true;
-            OrbitalObject_Activate();
+            LoadGravityProfile(gravityProfile);
             Log("Info", "Activated");
         }
 
