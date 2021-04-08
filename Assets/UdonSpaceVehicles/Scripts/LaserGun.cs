@@ -19,7 +19,7 @@ namespace UdonSpaceVehicles
         public KeyCode desktopKey = KeyCode.Space;
         public AudioSource audioSource;
         public AudioClip audioClip;
-        [Tooltip("Interval in seconds")] public float fireInterval = 0.5f;
+        [Tooltip("Interval in seconds")] public float fireInterval = 0.25f;
         #endregion
 
         #region Logics
