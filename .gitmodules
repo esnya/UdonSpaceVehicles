@@ -20,3 +20,6 @@
 	path = Assets/EasyQuestSwitch
 	url = https://github.com/JordoVR/EasyQuestSwitch.git
 	ignore = untracked
+[submodule "Assets/UdonRadioCommunication"]
+	path = Assets/UdonRadioCommunication
+	url = https://github.com/esnya/UdonRadioCommunication.git
