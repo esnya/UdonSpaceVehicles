@@ -15,6 +15,7 @@ namespace UdonSpaceVehicles
         [ListView("Event Target")] public UdonSharpBehaviour[] targets = {};
         [ListView("Event Target")][Popup("behaviour", "@targets")] public string[] events = {};
         public AudioClip onPressed, onReleased;
+        public float interval = 0.5f;
 
         private int targetCount;
         private AudioSource audioSource;
@@ -48,9 +49,16 @@ namespace UdonSpaceVehicles
         }
 
         [HideInInspector] public TouchSource touchSource;
+
+        private float sleepUntil = 0.0f;
         public void TouchEnter()
         {
             if (!isVR) return;
+
+            var time = Time.time;
+            if (time < sleepUntil) return;
+            sleepUntil = time + interval;
+
             PlayClip(onPressed);
             if (touchSource != null) touchSource.PlayHaptic(1.0f);
             SendEvents();

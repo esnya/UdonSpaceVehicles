@@ -16,8 +16,8 @@ namespace UdonSpaceVehicles
         public string onExit = "TouchExit";
 
         public VRC_Pickup.PickupHand hand;
-        [Range(0.0f, 1.0f)] public float hapticDuration = 1.0f;
-        [Range(0.0f, 1.0f)] public float hapticStrength = 0.2f;
+        [Range(0.0f, 1.0f)] public float hapticDuration = 0.5f;
+        [Range(0.0f, 1.0f)] public float hapticStrength = 0.5f;
         public float hapticFrequency = 320.0f;
         private const float strengthCorrection = 0.06f;
 
