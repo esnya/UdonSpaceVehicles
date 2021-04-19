@@ -20,8 +20,8 @@ namespace UdonSpaceVehicles
         public RCSController rcsController;
 
         [Space] [SectionHeader("Configurations")]  public Transform[] thrusters;
-        public float thrustPower = 20.0f;
-        [Range(0.0f, 1.0f)] public float thrustThreshold = 0.1f;
+        [Tooltip("N")]public float thrustPower = 400.0f;
+        [Range(0.0f, 1.0f)] public float thrustThreshold = 0.5f;
         #endregion
 
         #region Internal Variables

@@ -21,7 +21,9 @@ namespace UdonSpaceVehicles
         [ListView("Engines / Powers")] public Transform[] engines = { };
         [ListView("Engines / Powers")] public float[] powers = { };
         [RangeSlider(0.0f, 1.0f)] public float remoteAnimationThreshold = 0.1f;
-        [HelpBox("Updates float parameter \"Engine Power\" with max value of engine powers.")] public Animator[] animators;
+        [HelpBox("Updates float parameter \"Engine Power\" with max value of engine powers and \"Fuel\".")] public Animator[] animators;
+        [Tooltip("kg")] public float fuelCapacity = 5552.0f;
+        [Tooltip("kg/s, per engines")] public float fuelConsumption = 13.88f;
         [UdonSynced] private uint syncValue;
         #endregion
 
@@ -44,7 +46,11 @@ namespace UdonSpaceVehicles
 
         private void UpdateAnimatiors(float power)
         {
-            foreach (var animator in animators) animator.SetFloat("Engine Power", power);
+            foreach (var animator in animators)
+            {
+                animator.SetFloat("Engine Power", power);
+                animator.SetFloat("Fuel", fuel / fuelCapacity);
+            }
             syncValue = PackBool(syncValue, 31, power > remoteAnimationThreshold);
         }
         #endregion
@@ -53,9 +59,14 @@ namespace UdonSpaceVehicles
         int engineCount;
         Animator[] engineAnimators;
         Vector3[] axises;
+        float dryWeight, fuel;
         void Start()
         {
             if (findTargetFromParent) target = GetComponentInParent<Rigidbody>();
+
+            dryWeight = target.mass;
+            fuel = fuelCapacity;
+
             engineCount = Mathf.Min(engines.Length, powers.Length);
 
             axises = new Vector3[engineCount];
@@ -76,17 +87,32 @@ namespace UdonSpaceVehicles
         {
             if (!active) return;
 
-            var input = controllerInput.input;
-            var maxPower = 0.0f;
-            for (int i = 0; i < engineCount; i++)
+            if (fuel > 0)
             {
-                var axis = transform.InverseTransformVector(engines[i].forward);;
-                var power = Vector3.Dot(input, axis);
-                maxPower = Mathf.Max(maxPower, power);
-                SetPower(i, power);
+                var maxPower = 0.0f;
+                var totalPower = 0.0f;
+                var input = controllerInput.input;
+                for (int i = 0; i < engineCount; i++)
+                {
+                    var axis = transform.InverseTransformVector(engines[i].forward);;
+                    var power = Mathf.Max(Vector3.Dot(input, axis), 0);
+                    totalPower += power;
+                    maxPower = Mathf.Max(maxPower, power);
+                    SetPower(i, power);
+                }
+
+                fuel -= fuelConsumption * totalPower * Time.deltaTime;
+
+                UpdateAnimatiors(maxPower);
+            }
+            else
+            {
+                fuel = 0;
+                for (int i = 0; i < engineCount; i++) SetPower(i, 0.0f);
+                UpdateAnimatiors(0.0f);
             }
 
-            UpdateAnimatiors(maxPower);
+            target.mass = dryWeight + fuel;
         }
         #endregion
 
@@ -107,6 +133,13 @@ namespace UdonSpaceVehicles
             if (globalValue != UnpackBool(prevValue, 31)) UpdateAnimatiors(globalValue ? 1.0f : 0.0f);
 
             prevValue = syncValue;
+        }
+        #endregion
+
+        #region Custom Events
+        public void _Respawned()
+        {
+            fuel = fuelCapacity;
         }
         #endregion
 
