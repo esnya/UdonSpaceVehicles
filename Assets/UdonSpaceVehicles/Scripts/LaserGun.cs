@@ -8,18 +8,22 @@ using VRC.Udon.Common.Interfaces;
 
 namespace UdonSpaceVehicles
 {
-    [CustomName("USV Laser Gun")]
-    [HelpMessage("The gun.")]
-    [RequireComponent(typeof(ParticleSystem))]
+    [
+        CustomName("USV Laser Gun"),
+        HelpMessage("The gun."),
+        RequireComponent(typeof(ParticleSystem)),
+        RequireComponent(typeof(AudioSource)),
+    ]
     public class LaserGun : UdonSharpBehaviour
     {
         #region Public Variables
         public VehicleRoot vehicleRoot;
         public string vrButton = "Oculus_CrossPlatform_SecondaryIndexTrigger";
         public KeyCode desktopKey = KeyCode.Space;
-        public AudioSource audioSource;
         public AudioClip audioClip;
+        public float bulletSpeed = 100.0f;
         [Tooltip("Interval in seconds")] public float fireInterval = 0.25f;
+        public float scattering = 0.01f;
         #endregion
 
         #region Logics
@@ -28,13 +32,34 @@ namespace UdonSpaceVehicles
             if (vr) return Input.GetAxis(vrButton) > 0.5f;
             else return Input.GetKey(KeyCode.Space);
         }
+
+        [UdonSynced] Vector3 fireDirection;
+        private void Fire()
+        {
+            ready = false;
+            SendCustomEventDelayedSeconds(nameof(_Ready), fireInterval);
+
+            fireDirection = (transform.forward + (new Vector3(Random.value, Random.value, Random.value) * 2.0f - Vector3.one) * scattering).normalized;
+            RequestSerialization();
+            Emit();
+        }
+
+        ParticleSystem.EmitParams emitParams = new ParticleSystem.EmitParams();
+        private void Emit()
+        {
+            emitParams.velocity = fireDirection * bulletSpeed;
+            particleSystem.Emit(emitParams, 1);
+            audioSource.PlayOneShot(audioClip);
+        }
         #endregion
 
         #region Unity Events
         private new ParticleSystem particleSystem;
+        private AudioSource audioSource;
         private void Start()
         {
             particleSystem = GetComponent<ParticleSystem>();
+            audioSource = GetComponent<AudioSource>();
             Log("Info", "Initialized");
         }
 
@@ -44,9 +69,7 @@ namespace UdonSpaceVehicles
 
             if (ready && GetTrigger())
             {
-                ready = false;
-                SendCustomNetworkEvent(NetworkEventTarget.All, nameof(Fire));
-                SendCustomEventDelayedSeconds(nameof(_Ready), fireInterval);
+                Fire();
             }
         }
 
@@ -69,15 +92,14 @@ namespace UdonSpaceVehicles
                 Log("Info", $"VR: {vr}");
             }
         }
+
+        public override void OnDeserialization()
+        {
+            Emit();
+        }
         #endregion
 
         #region Custom Events
-        public void Fire()
-        {
-            particleSystem.Emit(1);
-            if (audioSource != null) audioSource.PlayOneShot(audioClip);
-        }
-
         private bool ready;
         public void _Ready()
         {
@@ -118,7 +140,8 @@ namespace UdonSpaceVehicles
         #endregion
 
 #if !COMPILER_UDONSHARP && UNITY_EDITOR
-        private void OnDrawGizmos() {
+        private void OnDrawGizmos()
+        {
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, 0.01f);
             Gizmos.DrawRay(transform.position, transform.forward);

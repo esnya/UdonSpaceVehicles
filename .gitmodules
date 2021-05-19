@@ -5,6 +5,7 @@
 [submodule "Assets/UdonToolkit"]
 	path = Assets/UdonToolkit
 	url = https://github.com/orels1/UdonToolkit.git
+	ignore = dirty
 [submodule "Assets/UdonSharp"]
 	path = Assets/UdonSharp
 	url = https://github.com/MerlinVR/UdonSharp.git

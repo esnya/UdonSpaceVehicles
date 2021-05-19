@@ -59,12 +59,23 @@ namespace UdonSpaceVehicles
                 var diff = Vector3.Scale(-headPosition, adjustorAxis);
                 transform.localPosition += diff;
                 adjusted = diff.magnitude <= adjustorThreshold;
-                Log("Info", $"Adjusting {diff}");
+                if (adjusted) RequestSerialization();
             }
         }
         #endregion
 
         #region Udon Events
+        [UdonSynced] private Vector3 offset = Vector3.zero;
+        public override void OnPreSerialization()
+        {
+            offset = transform.localPosition - initialPosition;
+        }
+
+        public override void OnDeserialization()
+        {
+            transform.localPosition = initialPosition + offset;
+        }
+
         bool vr;
         public override void OnPlayerJoined(VRCPlayerApi player)
         {
@@ -77,6 +88,7 @@ namespace UdonSpaceVehicles
 
         public override void Interact()
         {
+            Networking.SetOwner(Networking.LocalPlayer, gameObject);
             Networking.LocalPlayer.UseAttachedStation();
         }
 
@@ -108,6 +120,7 @@ namespace UdonSpaceVehicles
 
                 seated = false;
                 transform.localPosition = initialPosition;
+                offset = Vector3.zero;
             }
         }
         #endregion
