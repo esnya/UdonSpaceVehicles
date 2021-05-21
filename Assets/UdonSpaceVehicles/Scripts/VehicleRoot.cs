@@ -4,15 +4,17 @@ using UdonToolkit;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
+using VRC.SDK3.Components;
 #if !COMPILER_UDONSHARP && UNITY_EDITOR
 using UdonSharpEditor;
 #endif
 
 namespace UdonSpaceVehicles
 {
-    [CustomName("USV Vehicle Root")]
-    [HelpMessage("Manages collisions, and respawns, vehicle syncPower states. Attach to the root game object with a Rigidbody. !! KEEP ONLY ONE RIGIDBODY ON ONE VEHICLE !!")]
-    [RequireComponent(typeof(Rigidbody))]
+    [CustomName("USV Vehicle Root"),
+    HelpMessage("Manages collisions and respawns, vehicle syncPower states. Attach to the root game object with a Rigidbody. !! KEEP ONLY ONE RIGIDBODY ON ONE VEHICLE !!"),
+    RequireComponent(typeof(Rigidbody)), RequireComponent(typeof(VRCObjectSync)),
+    UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
     public class VehicleRoot : UdonSharpBehaviour
     {
         #region Public Variables
@@ -104,9 +106,7 @@ namespace UdonSpaceVehicles
         private bool prevPower;
         public override void OnDeserialization()
         {
-            if (prevPower == syncPower) return;
             SetBool("Power", syncPower);
-            prevPower = syncPower;
         }
         #endregion
 

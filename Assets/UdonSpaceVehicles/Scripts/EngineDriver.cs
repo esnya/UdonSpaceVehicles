@@ -11,6 +11,7 @@ namespace UdonSpaceVehicles
 {
     [CustomName("USV Engine Driver")]
     [HelpMessage("Applies the power of the main engine and animates  The ControllerInput is required as a throttle.")]
+    [UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
     public class EngineDriver : UdonSharpBehaviour
     {
         #region Public Variables

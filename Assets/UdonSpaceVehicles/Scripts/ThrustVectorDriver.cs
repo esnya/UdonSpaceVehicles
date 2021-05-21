@@ -11,6 +11,7 @@ namespace UdonSpaceVehicles
 {
     [CustomName("USV Thrust Vector Driver")]
     [HelpMessage("Manipulate the direction of the thrust vector of engines.")]
+    [UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
 
     public class ThrustVectorDriver : UdonSharpBehaviour
     {

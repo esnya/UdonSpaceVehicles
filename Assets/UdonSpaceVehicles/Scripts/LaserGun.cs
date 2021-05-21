@@ -13,6 +13,7 @@ namespace UdonSpaceVehicles
         HelpMessage("The gun."),
         RequireComponent(typeof(ParticleSystem)),
         RequireComponent(typeof(AudioSource)),
+        UdonBehaviourSyncMode(BehaviourSyncMode.Manual),
     ]
     public class LaserGun : UdonSharpBehaviour
     {

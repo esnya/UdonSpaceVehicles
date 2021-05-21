@@ -12,6 +12,7 @@ namespace UdonSpaceVehicles
 {
     [CustomName("USV Damage Manager")]
     [HelpMessage("Manages vehicle damage.")]
+    [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class DamageManager : UdonSharpBehaviour
     {
         #region Public Variables
@@ -54,9 +55,7 @@ namespace UdonSpaceVehicles
         private bool prevDamaged;
         public override void OnDeserialization()
         {
-            if (syncDamaged == prevDamaged) return;
             SetDamaged(syncDamaged);
-            prevDamaged = syncDamaged;
         }
         #endregion
 
@@ -67,6 +66,7 @@ namespace UdonSpaceVehicles
             hp = maxHP;
             SetDamaged(false);
             syncDamaged = false;
+            RequestSerialization();
         }
 
         public void _Hit()
@@ -116,6 +116,7 @@ namespace UdonSpaceVehicles
             }
 
             syncDamaged = hp <= Mathf.Max(1.0f, maxHP * 0.25f);
+            RequestSerialization();
             SetDamaged(syncDamaged);
 
             if (hp <= 0.0f) Dead();

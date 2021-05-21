@@ -10,6 +10,7 @@ namespace UdonSpaceVehicles
 {
     [CustomName("USV Solid Fuel Booster Driver")]
     [HelpMessage("Used-up acceleration booster. Send custom event \"Trigger\" to ignite. Updates an animatior float parameter \"Power\" on children with sync.")]
+    [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class SolidFuelBoosterDriver : UdonSharpBehaviour
     {
         #region Public Variables
@@ -47,11 +48,9 @@ namespace UdonSpaceVehicles
         #endregion
 
         #region Udon Events
-        private bool prevBurning;
         public override void OnDeserialization()
         {
-            if (burning != prevBurning) SetAnimation();
-            prevBurning = burning;
+            SetAnimation();
         }
         #endregion
 
@@ -59,6 +58,8 @@ namespace UdonSpaceVehicles
         public void _Respawned()
         {
             burning = false;
+            RequestSerialization();
+
             SetAnimation();
             ignished = 0;
         }
@@ -66,6 +67,8 @@ namespace UdonSpaceVehicles
         public void _Extinguish()
         {
             burning = false;
+            RequestSerialization();
+
             SetAnimation();
             Log("Info", "Extinguished");
         }
@@ -76,6 +79,8 @@ namespace UdonSpaceVehicles
 
             SendCustomEventDelayedSeconds(nameof(_Extinguish), burningTime);
             burning = true;
+            RequestSerialization();
+
             SetAnimation();
             ignished++;
             Log("Info", "Ignished");

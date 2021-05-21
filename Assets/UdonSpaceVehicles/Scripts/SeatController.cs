@@ -9,6 +9,7 @@ namespace UdonSpaceVehicles
     [CustomName("USV Seat Controller")]
     [HelpMessage("Controls the pilot seat. The vehicle is initially activated with this component.")]
     [RequireComponent(typeof(VRCStation))]
+    [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class SeatController : UdonSharpBehaviour
     {
         #region Public Variables

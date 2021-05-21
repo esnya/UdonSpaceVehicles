@@ -11,6 +11,7 @@ namespace UdonSpaceVehicles
 {
     [CustomName("USV Thruster Driver")]
     [HelpMessage("Applies thruster force to the vehicle, and animate them. Updates an animator float parameter \"Power\" on children with sync.")]
+    [UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
     public class ThrusterDriver : UdonSharpBehaviour
     {
         #region Public Variables
