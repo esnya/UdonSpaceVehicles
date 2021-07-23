@@ -53,6 +53,7 @@ MonoBehaviour:
   proximity: 2
   SynchronizePosition: 0
   AllowCollisionOwnershipTransfer: 0
+  Reliable: 0
   serializedProgramAsset: {fileID: 11400000, guid: f7d4ee130fc211740b17e1d67c3cac29,
     type: 2}
   programSource: {fileID: 11400000, guid: adcff1b5780a527479968d7266bdab68, type: 2}
@@ -111,6 +112,7 @@ MonoBehaviour:
   proximity: 2
   SynchronizePosition: 0
   AllowCollisionOwnershipTransfer: 0
+  Reliable: 0
   serializedProgramAsset: {fileID: 11400000, guid: 57a8c0d1abb47234b9edf0cafd7a9e01,
     type: 2}
   programSource: {fileID: 11400000, guid: b24bf7fe2b9e94043b0ed2eeecfe4c43, type: 2}
@@ -169,6 +171,7 @@ MonoBehaviour:
   proximity: 2
   SynchronizePosition: 0
   AllowCollisionOwnershipTransfer: 0
+  Reliable: 0
   serializedProgramAsset: {fileID: 11400000, guid: 57a8c0d1abb47234b9edf0cafd7a9e01,
     type: 2}
   programSource: {fileID: 11400000, guid: b24bf7fe2b9e94043b0ed2eeecfe4c43, type: 2}
@@ -227,6 +230,7 @@ MonoBehaviour:
   proximity: 2
   SynchronizePosition: 0
   AllowCollisionOwnershipTransfer: 0
+  Reliable: 0
   serializedProgramAsset: {fileID: 11400000, guid: 57a8c0d1abb47234b9edf0cafd7a9e01,
     type: 2}
   programSource: {fileID: 11400000, guid: b24bf7fe2b9e94043b0ed2eeecfe4c43, type: 2}
@@ -285,6 +289,7 @@ MonoBehaviour:
   proximity: 2
   SynchronizePosition: 0
   AllowCollisionOwnershipTransfer: 0
+  Reliable: 0
   serializedProgramAsset: {fileID: 11400000, guid: 57a8c0d1abb47234b9edf0cafd7a9e01,
     type: 2}
   programSource: {fileID: 11400000, guid: b24bf7fe2b9e94043b0ed2eeecfe4c43, type: 2}
@@ -439,26 +444,6 @@ PrefabInstance:
       propertyPath: publicVariablesUnityEngineObjects.Array.data[6]
       value: 
       objectReference: {fileID: 8599076004082285543}
-    - target: {fileID: 1164265858009854537, guid: 6b1d052070d35e74da2c681c0b0faaf8,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1164265858009854537, guid: 6b1d052070d35e74da2c681c0b0faaf8,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1164265858009854537, guid: 6b1d052070d35e74da2c681c0b0faaf8,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1164265858009854537, guid: 6b1d052070d35e74da2c681c0b0faaf8,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 2165798929559328773, guid: 6b1d052070d35e74da2c681c0b0faaf8,
         type: 3}
       propertyPath: m_LocalRotation.y
@@ -470,11 +455,6 @@ PrefabInstance:
       value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 2763165025973724177, guid: 6b1d052070d35e74da2c681c0b0faaf8,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3025298569783665309, guid: 6b1d052070d35e74da2c681c0b0faaf8,
         type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -514,11 +494,6 @@ PrefabInstance:
       propertyPath: publicVariablesUnityEngineObjects.Array.data[4]
       value: 
       objectReference: {fileID: 1812557106}
-    - target: {fileID: 4185150121533314817, guid: 6b1d052070d35e74da2c681c0b0faaf8,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 14
-      objectReference: {fileID: 0}
     - target: {fileID: 5392129872878739754, guid: 6b1d052070d35e74da2c681c0b0faaf8,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -617,19 +592,12 @@ PrefabInstance:
     - target: {fileID: 6323199306305671607, guid: 6b1d052070d35e74da2c681c0b0faaf8,
         type: 3}
       propertyPath: m_RootOrder
-      value: 13
+      value: 14
       objectReference: {fileID: 0}
     - target: {fileID: 6323199306306096539, guid: 6b1d052070d35e74da2c681c0b0faaf8,
         type: 3}
       propertyPath: m_IsActive
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6750887629095179923, guid: 6b1d052070d35e74da2c681c0b0faaf8,
-        type: 3}
-      propertyPath: m_text
-      value: "<size=100%>0.00</size> <size=75%>KMpH</size>\r\n<align=left><size=75%>0.00</size>
-        <size=56%>KMpH</size></align>  <align=right><size=75%>0.00</size> <size=56%>KMpH</size></align>\r\n<size=75%>0.00</size>
-        <size=56%>G</size>"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6b1d052070d35e74da2c681c0b0faaf8, type: 3}

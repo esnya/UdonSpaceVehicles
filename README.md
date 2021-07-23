@@ -7,11 +7,15 @@ This is the Udon package for realizing a space plane with VRChat. Simulates orbi
 Inspired by [SaccFlightAndVehicles](https://github.com/Sacchan-VRC/SaccFlightAndVehicles.git)
 
 ## Requirements
-* VRCSDK3-WORLD 2021.03.22.18.27 or later
-* [UdonSharp](https://github.com/MerlinVR/UdonSharp/tree/v0.19.5) v0.19.8 or later
-* [UdonToolKit](https://github.com/orels1/UdonToolkit/tree/develop) v1.0.0-rc2 or later
-  * Download from **develop branch**. Do not from rerelases because it's not released yet.
-  * Recommended to setup acording to [Installation](https://github.com/orels1/UdonToolkit/tree/develop#installation)
+**Use latest versions**
+* VRCSDK3-WORLD
+* [UdonSharp](https://github.com/MerlinVR/UdonSharp)
+* [UdonToolKit](https://github.com/orels1/UdonToolkit)
+  * Recommended to setup acording to [Installation](https://github.com/orels1/UdonToolkit#installation)
+
+## Optional Requirements
+Used in demo scene but not required.
+* [UdonRadioCommunication](https://github.com/esnya/UdonRadioCommunication)
 
 ## Components
 <!-- _USV_COMPONENTS_ -->
@@ -75,7 +79,6 @@ Manages collisions, and respawns, vehicle power states. Attach to the root game 
 VRChatで宇宙機を実現するためのUdonパッケージです。6軸機動、引力などの軌道上の挙動をシミュレートします。
 
 ## Requirements
-* [UdonSharp](https://github.com/MerlinVR/UdonSharp/tree/v0.19.5) v0.19.8 以降
-* [UdonToolKit](https://github.com/orels1/UdonToolkit/tree/develop) v1.0.0-rc 以降
-  * **develop**ブランチからダウンロードしてください。 リリースはまだされていないのでGitHubにunitypackageはありません。
+* [UdonSharp](https://github.com/MerlinVR/UdonSharp)
+* [UdonToolKit](https://github.com/orels1/UdonToolkit)
   * [Installation](https://github.com/orels1/UdonToolkit/tree/develop#installation)の設定をしておくことを推奨します。
