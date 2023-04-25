@@ -32,14 +32,14 @@
     ]
   },
   "devDependencies": {
-    "@commitlint/cli": "^11.0.0",
+    "@commitlint/cli": "^17.6.1",
     "@commitlint/config-conventional": "^11.0.0",
-    "@commitlint/core": "^11.0.0",
+    "@commitlint/core": "^17.6.1",
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/github": "^8.0.4",
-    "commitlint-config-gitmoji": "^2.1.10",
-    "husky": "^4.3.8",
-    "semantic-release": "^19.0.3",
+    "commitlint-config-gitmoji": "^2.3.1",
+    "husky": "^8.0.3",
+    "semantic-release": "^21.0.1",
     "semantic-release-gitmoji": "^1.4.5"
   },
   "release": {
