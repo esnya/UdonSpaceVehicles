@@ -17,6 +17,9 @@
   },
   "license": "MIT",
   "author": "esnya",
+  "engines": {
+    "node": ">=20"
+  },
   "main": "index.js",
   "scripts": {
     "prepare": "husky",
